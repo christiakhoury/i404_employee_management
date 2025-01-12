@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Add Employee</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+</head>
+<body>
+<div class="vh-100 container">
+    <h3>Create Request</h3>
+    <hr>
+    <h5>save Employee</h5>
+    <form class="form-check w-100" method="POST" action="#" th:action="@{/employees/employees/createRequest}" th:object="${employee}">
+        <input type="text" placeholder="Request Title" class="input-group-text" name="name" required>
+        <br>
+        <select id="request_type" name="request_type" class="input-group-text w-90">
+            <option th:each="request_type : ${requestTypes}" th:value="${request_type}" th:text="${request_type}"></option>
+        </select>
+        <br>
+        <input type="date" placeholder="Request Date" class="input-group-text" name="request_date" required>
+        <br>
+        <input type="hidden" th:field="*{id}"> <!-- employee.id will be automatically set here -->
+        <input type="hidden" name="status" value="PENDING"> <!-- Setting default value for status -->
+
+        <button class="btn btn-outline-info my-3" type="submit">save</button>
+    </form>
+    <hr>
+    <a href="/" class="text-decoration-none">back to Employee List</a>
+</div>
+</body>
+</html>
+
+
+<!--<!DOCTYPE html>-->
+<!--<html lang="en" xmlns:th="http://www.thymeleaf.org">-->
+<!--<head>-->
+<!--    <meta charset="UTF-8">-->
+<!--    <title>Add Employee</title>-->
+<!--    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">-->
+<!--</head>-->
+<!--<body>-->
+<!--<div class="vh-100 container">-->
+<!--    <h3>Create Request</h3>-->
+<!--    <hr>-->
+<!--    <h5>Save Employee</h5>-->
+<!--    <form class="form-check w-100" method="POST" action="#" th:action="@{/employees/employees/createRequest}" th:object="${employee}">-->
+
+<!--        &lt;!&ndash; Request Title &ndash;&gt;-->
+<!--        <input type="text" placeholder="Request Title" class="input-group-text" name="name" required>-->
+
+<!--        &lt;!&ndash; Request Type &ndash;&gt;-->
+<!--        <select id="request_type" name="request_type" class="input-group-text w-90">-->
+<!--            <option th:each="request_type : ${request_types}" th:value="${request_type}" th:text="${request_type}"></option>-->
+<!--        </select>-->
+<!--        <br>-->
+
+<!--        &lt;!&ndash; Request Date &ndash;&gt;-->
+<!--        <input type="date" placeholder="Request Date" class="input-group-text" name="request_date" required>-->
+<!--        <br>-->
+
+<!--        &lt;!&ndash; Hidden Fields &ndash;&gt;-->
+<!--        <input type="hidden" th:field="*{employee.id}" value="${employee.id}">-->
+<!--        <input type="hidden" th:field="*{employee.department.id}" value="${employee.department.id}">-->
+
+<!--        <button class="btn btn-outline-info my-3" type="submit">Save</button>-->
+<!--    </form>-->
+<!--    <hr>-->
+<!--    <a href="/" class="text-decoration-none">Back to Employee List</a>-->
+<!--</div>-->
+<!--</body>-->
+<!--</html>-->

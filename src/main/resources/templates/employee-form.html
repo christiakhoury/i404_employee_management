@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Add Employee</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+</head>
+<body>
+<div class="vh-100 container">
+    <h3>Employee Directory</h3>
+    <hr>
+    <h5>save Employee</h5>
+    <form class="form-check w-100" method="POST" action="#" th:action="@{/employees/employees/add}" th:object="${employee}">
+        <input type="text" placeholder="First Name" class="input-group-text" name="firstName" required>
+        <br>
+        <input type="text" placeholder="Last Name" class="input-group-text" name="lastName" required>
+        <br>
+        <input type="email" placeholder="Email" class="input-group-text" name="email" required>
+        <br>
+        <input type="text" placeholder="User Name" class="input-group-text" name="username" required>
+        <br>
+<!--        <input type="text" placeholder="Role" class="input-group-text" name="role" required>-->
+        <select id="role" name="role" class="input-group-text w-97" >
+            <option th:each="role : ${roles}" th:value="${role}" th:text="${role}"></option>
+        </select>
+        <br>
+        <select id="department" name="department" class="input-group-text w-90">
+            <option th:each="department : ${departments}" th:value="${department}" th:text="${department}"></option>
+        </select>
+        <br>
+        <input type="password" placeholder="Password" class="input-group-text" name="password" required>
+        <i th:if="${registrationError}" th:text="${registrationError}" class="text-danger"></i>
+        <button class="btn btn-outline-info my-3" type="submit">save</button>
+    </form>
+    <hr>
+    <a href="/" class="text-decoration-none">back to Employee List</a>
+</div>
+</body>
+</html>

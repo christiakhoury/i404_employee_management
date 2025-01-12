@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Add Employee</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+</head>
+<body>
+<div class="vh-100 container position-relative">
+    <h3>Requests</h3>
+    <hr>
+    <div>
+        <a sec:authorize="hasAnyRole('MANAGER','ADMIN')" class="btn btn-info mb-3"
+           th:href="@{/employees/addEmployee}">Add Employee</a>
+
+        <a class="btn btn-info mb-3"
+           th:href="@{/}">List Employees</a>
+    </div>
+
+    <table class="w-100 table table-light" border="1">
+        <thead class="bg-dark">
+        <tr class="text-white">
+            <th>FirstName</th>
+            <th>LastName</th>
+            <th>Department</th>
+            <th>Date</th>
+            <th>Type</th>
+            <th>State</th>
+            <td th:if="${isAdmin}">~</td>
+        </tr>
+        </thead>
+        <tbody th:each="request : ${requestPage.content}">
+        <tr>
+            <div th:if="${request.getId() != changeId}">
+                <td><input disabled th:value="${request.getEmployee().getFirstName()}"
+                           class="border-0 rounded-pill p-2"></td>
+                <td><input disabled th:value="${request.getEmployee().getLastName()}"
+                           class="border-0 rounded-pill p-2"></td>
+                <td><input disabled th:value="${request.getRequest_date()}"
+                           class="border-0 rounded-pill p-2"></td>
+                <td><input disabled th:value="${request.getRequest_type_id().getName()}"
+                           class="border-0 rounded-pill p-2"></td>
+                <td><input disabled th:value="${request.getState()}"
+                           class="border-0 rounded-pill p-2"></td>
+                <td th:if="${isAdmin}">
+                    <a th:href="@{/employees/showFormForUpdate/{id}(id=${employee.getId()})}" class="btn btn-info">Update</a>
+                </td>
+            </div>
+        </tr>
+        </tbody>
+    </table>
+    <div class="d-flex justify-content-between align-items-center mt-3">
+        <span th:text="'Page ' + (${currentPage} + 1) + ' of ' + ${totalPages}"></span>
+        <div>
+            <a class="btn btn-secondary"
+               th:if="${currentPage > 0}"
+               th:href="@{/employees/seeRequets(page=${currentPage - 1})}">
+
+                Previous
+            </a>
+            <!--               th:href="@{/employees/list(page=${currentPage - 1})}">-->
+            <a class="btn btn-secondary"
+               th:if="${currentPage + 1 < totalPages}"
+               th:href="@{/employees/seeRequets(page=${currentPage + 1})}">
+                Next
+            </a>
+        </div>
+    </div>
+
+
+    <div class="position-absolute top-0 end-0 my-2 d-flex">
+        <form action="#" th:action="@{/logout}" method="post">
+            <input class="btn btn-outline-secondary" type="submit" value="logout"/>
+        </form>
+    </div>
+</div>
+<!--    -->
+<!--<table>-->
+<!--    <thead>-->
+<!--    <tr>-->
+<!--        <th>Employee Name</th>-->
+<!--        <th>Request Details</th>-->
+<!--    </tr>-->
+<!--    </thead>-->
+<!--    <tbody>-->
+<!--    <tr th:each="request : ${requests}">-->
+<!--        <td th:text="${request.employee.firstName} + ' ' + ${request.employee.lastName}"></td>-->
+<!--&lt;!&ndash;        <td th:text="${request.details}"></td>&ndash;&gt;-->
+<!--    </tr>-->
+<!--    </tbody>-->
+<!--</table>-->
+<!--</body>-->
+<!--</html>-->
