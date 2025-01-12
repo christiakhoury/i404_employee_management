@@ -7,8 +7,8 @@ import com.mrurespect.employeeapp.security.WebUser;
 import com.mrurespect.employeeapp.service.EmployeeService;
 import com.mrurespect.employeeapp.service.UserService;
 
-import javax.servlet.http.HttpSession;
-import javax.validation.Valid;
+import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 
 import org.apache.catalina.Store;
 import org.springframework.beans.factory.annotation.Autowired;
