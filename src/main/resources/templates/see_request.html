@@ -32,15 +32,15 @@
         <tbody th:each="request : ${requestPage.content}">
         <tr>
             <div th:if="${request.getId() != changeId}">
-                <td><input disabled th:value="${request.getEmployee().getFirstName()}"
+                <td><input disabled th:value="${request.getEmployee()}"
                            class="border-0 rounded-pill p-2"></td>
-                <td><input disabled th:value="${request.getEmployee().getLastName()}"
-                           class="border-0 rounded-pill p-2"></td>
+<!--                <td><input disabled th:value="${request.getEmployee().getLastName()}"-->
+<!--                           class="border-0 rounded-pill p-2"></td>-->
                 <td><input disabled th:value="${request.getRequest_date()}"
                            class="border-0 rounded-pill p-2"></td>
-                <td><input disabled th:value="${request.getRequest_type_id().getName()}"
+                <td><input disabled th:value="${request.getRequest_type()}"
                            class="border-0 rounded-pill p-2"></td>
-                <td><input disabled th:value="${request.getState()}"
+                <td><input disabled th:value="${request.getStatus()}"
                            class="border-0 rounded-pill p-2"></td>
                 <td th:if="${isAdmin}">
                     <a th:href="@{/employees/showFormForUpdate/{id}(id=${employee.getId()})}" class="btn btn-info">Update</a>

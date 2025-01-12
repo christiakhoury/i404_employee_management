@@ -1,8 +1,6 @@
 package com.mrurespect.employeeapp.service;
 
-import com.mrurespect.employeeapp.dao.RequestRepository;
-import com.mrurespect.employeeapp.dao.RequestStateDAO;
-import com.mrurespect.employeeapp.dao.RequestTypeDAO;
+import com.mrurespect.employeeapp.dao.*;
 import com.mrurespect.employeeapp.entity.Department;
 import com.mrurespect.employeeapp.entity.Employee;
 import com.mrurespect.employeeapp.entity.Request;
@@ -24,12 +22,14 @@ public class RequestServiceImpl implements RequestService{
     private final RequestTypeDAO requestTypeDAO;
     private final RequestRepository requestRepository;
     private final RequestStateDAO requestStateDAO;
+    private final EmployeeDAO employeeDAO;
 
-    public RequestServiceImpl(JdbcTemplate jdbcTemplate, RequestTypeDAO requestTypeDAO, RequestRepository requestRepository, RequestStateDAO requestStateDAO) {
+    public RequestServiceImpl(JdbcTemplate jdbcTemplate, RequestTypeDAO requestTypeDAO, RequestRepository requestRepository, RequestStateDAO requestStateDAO, EmployeeDAO employeeDAO) {
         this.jdbcTemplate = jdbcTemplate;
         this.requestTypeDAO = requestTypeDAO;
         this.requestRepository = requestRepository;
         this.requestStateDAO = requestStateDAO;
+        this.employeeDAO = employeeDAO;
     }
 
     private RequesttType findRequestTypeById(Long requestTypeId) {
@@ -60,13 +60,16 @@ public class RequestServiceImpl implements RequestService{
                     // Create and map Request object
                     Request request = new Request();
                     request.setId(rs.getLong("id"));
-//                    request.setRequestState(rs.getString("request_state"));
-                    request.setRequest_date(rs.getDate("date").toLocalDate()); // Adjust if needed
+                    request.setRequest_date(rs.getDate("request_date").toLocalDate()); // Adjust if needed
 
-
-                    Long request_type = rs.getLong("request_type_id");
-                    RequesttType requestType = findRequestTypeById(request_type);
+                    Long requestTypeId = rs.getLong("request_type_id");
+                    RequesttType requestType = findRequestTypeById(requestTypeId);
                     request.setRequest_type_id(requestType);
+                    request.setStatus(rs.getString("status"));
+                    request.setName(rs.getString("name"));
+                    Employee employee_rec = employeeDAO.findById(rs.getInt("employee_id"));
+                    request.setEmployee(employee_rec);
+                    request.setRequest_type(rs.getString("request_type_name"));
 
                     return request;
                 }
@@ -151,7 +154,9 @@ public class RequestServiceImpl implements RequestService{
                     request.setRequest_type_id(requestType);
                     request.setStatus(rs.getString("status"));
                     request.setName(rs.getString("name"));
-//                    request.setEmployee(rs.getObject("employee_id"));
+                    Employee employee_rec = employeeDAO.findById(rs.getInt("employee_id"));
+                    request.setEmployee(employee_rec);
+                    request.setRequest_type(rs.getString("request_type_name"));
                     return request;
                 }
         );
@@ -189,6 +194,7 @@ public class RequestServiceImpl implements RequestService{
         // Create and return a Page object (from Spring Data's Page class)
         return new PageImpl<>(requests, PageRequest.of(page - 1, size), totalRecords);
     }
+
 
     @Override
     @Transactional
