@@ -1,6 +1,7 @@
 package com.mrurespect.employeeapp.service;
 
 
+import com.mrurespect.employeeapp.dao.EmployeeUserDTOImpl;
 import com.mrurespect.employeeapp.entity.Employee;
 import org.springframework.data.domain.Page;
 import org.springframework.security.core.Authentication;
@@ -15,7 +16,7 @@ public interface EmployeeService {
 
     Optional<Employee> findById(int theId);
 
-    Employee save(Employee theEmployee);
+//    Employee save(Employee theEmployee);
 
     void deleteById(int theId);
 
@@ -29,4 +30,7 @@ public interface EmployeeService {
 
     Page<Employee> searchEmployeesByFirstName(String firstName, int page, int size);
 
+    void listEmployees(Model model, Authentication authentication, String firstName, int page, int size);
+
+    Employee postAddEmployee(EmployeeUserDTOImpl employeeUserDTO);
 }

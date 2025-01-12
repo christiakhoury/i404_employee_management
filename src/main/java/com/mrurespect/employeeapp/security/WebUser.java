@@ -5,6 +5,7 @@ import com.mrurespect.employeeapp.entity.Employee;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
+
 public class WebUser {
     @NotNull(message = "username is required")
     private String username;
