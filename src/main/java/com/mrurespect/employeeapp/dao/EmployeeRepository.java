@@ -8,5 +8,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface EmployeeRepository extends JpaRepository<Employee, Integer> {
 
     Page<Employee> findAll(Pageable pageable);
-
+    Page<Employee> findByFirstName(String firstName, Pageable pageable);
 }

@@ -13,5 +13,6 @@ public interface EmployeeDAO {
 
     int deleteByID(int id);
 
+    List<Employee> findByFirstName(String firstName);
 
 }
