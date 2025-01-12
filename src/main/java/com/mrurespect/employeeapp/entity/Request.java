@@ -1,6 +1,7 @@
 package com.mrurespect.employeeapp.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 
@@ -15,6 +16,15 @@ public class Request {
     private String name;
 
     private String status;
+    private String request_type;
+
+    public String getRequest_type() {
+        return request_type;
+    }
+
+    public void setRequest_type(String request_type) {
+        this.request_type = request_type;
+    }
 
     @ManyToOne
     @JoinColumn(name = "employee_id")
@@ -28,6 +38,7 @@ public class Request {
     @JoinColumn(name = "state", nullable = false)
     private RequestState state;
 
+    @JsonFormat(pattern = "mm/dd/yyyy")
     @Column(name = "request_date") // Map to the column in the DB
     private LocalDate request_date; // Use LocalDate for the date field
 
