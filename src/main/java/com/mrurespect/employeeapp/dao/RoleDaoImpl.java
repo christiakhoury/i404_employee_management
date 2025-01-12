@@ -3,8 +3,8 @@ package com.mrurespect.employeeapp.dao;
 import com.mrurespect.employeeapp.entity.Role;
 import org.springframework.stereotype.Repository;
 
-import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
 
 @Repository
 public class RoleDaoImpl implements RoleDao {

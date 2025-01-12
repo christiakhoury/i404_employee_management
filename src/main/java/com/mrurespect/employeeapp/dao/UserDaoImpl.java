@@ -2,8 +2,8 @@ package com.mrurespect.employeeapp.dao;
 
 import com.mrurespect.employeeapp.entity.User;
 
-import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
 import org.springframework.stereotype.Repository;
 
 @Repository

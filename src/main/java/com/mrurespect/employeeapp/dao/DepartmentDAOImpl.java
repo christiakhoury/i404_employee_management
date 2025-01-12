@@ -4,8 +4,8 @@ import com.mrurespect.employeeapp.entity.Department;
 import com.mrurespect.employeeapp.entity.User;
 import org.springframework.stereotype.Repository;
 
-import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
 
 @Repository
 public class DepartmentDAOImpl implements DepartmentDAO {
