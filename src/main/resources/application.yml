@@ -13,12 +13,13 @@
 #spring.jpa.hibernate.ddl-auto=update
 #spring.main.banner-mode=off
 
-
+server:
+  port: 8081
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/db_project_3
+    url: jdbc:postgresql://localhost:5432/springBoot
     username: postgres
-    password: admin
+    password: 
     driver-class-name: org.postgresql.Driver
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect

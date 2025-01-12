@@ -22,4 +22,7 @@ public interface EmployeeService {
     Page<Employee> getPaginatedEmployees(int page, int size);
 
     void deleteEmployeeAndUser(int employeeId);
+    
+    Page<Employee> searchEmployeesByFirstName(String firstName, int page, int size);
+
 }

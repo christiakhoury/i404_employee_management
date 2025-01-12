@@ -1,6 +1,7 @@
 package com.mrurespect.employeeapp.service;
 
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import com.mrurespect.employeeapp.dao.DepartmentDAO;
 import com.mrurespect.employeeapp.dao.EmployeeRepository;
 import com.mrurespect.employeeapp.dao.RoleDao;
@@ -8,6 +9,7 @@ import com.mrurespect.employeeapp.entity.Employee;
 import com.mrurespect.employeeapp.entity.User;
 import com.mrurespect.employeeapp.security.WebUser;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -38,6 +40,13 @@ public class EmployeeServiceImpl implements EmployeeService {
     public Page<Employee> getPaginatedEmployees(int page, int size) {
         return employeeRepository.findAll(PageRequest.of(page, size, Sort.by("id").ascending()));
     }
+
+    @Override
+    public Page<Employee> searchEmployeesByFirstName(String firstName, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending()); // Adjust sorting as needed
+        return employeeRepository.findByFirstName(firstName, pageable);
+    }
+
 
     @Override
     public void deleteEmployeeAndUser(int employeeId) {
@@ -79,6 +88,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         return employeeRepository.findById(theId);
     }
+
 
 //    @Override
 //    public Employee save(Employee theEmployee) {
@@ -147,6 +157,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
         return employee;
     }
+ 
 }
 
 

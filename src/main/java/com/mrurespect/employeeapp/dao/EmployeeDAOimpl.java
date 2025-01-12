@@ -31,6 +31,12 @@ public class EmployeeDAOimpl implements EmployeeDAO {
     }
 
     @Override
+    public List<Employee> findByFirstName(String firstName) {
+        sql = "SELECT * FROM employees WHERE first_name = ?";
+        return jdbcTemplate.query(sql, employeeMapper,firstName);
+    }
+
+    @Override
     public int save(Employee employee) {
 
         sql = "insert into employees(email, first_name, last_name) values (?,?,?)";
