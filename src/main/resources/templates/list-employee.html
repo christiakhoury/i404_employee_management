@@ -14,7 +14,9 @@
         <a sec:authorize="hasAnyRole('MANAGER','ADMIN')" class="btn btn-info mb-3"
            th:href="@{/employees/addEmployee}">Add Employee</a>
 
-        <a sec:authorize="hasAnyRole('MANAGER','ADMIN')" class="btn btn-info mb-3"
+<!--        <a sec:authorize="hasAnyRole('MANAGER','ADMIN')" class="btn btn-info mb-3"-->
+<!--           th:href="@{/employees/seeRequets}">Requests</a>-->
+        <a class="btn btn-info mb-3"
            th:href="@{/employees/seeRequets}">Requests</a>
 
         <a class="btn btn-info mb-3"

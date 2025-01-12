@@ -15,8 +15,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.ui.Model;
 
 import java.util.Arrays;
 import java.util.List;
@@ -28,13 +30,19 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     private final EmployeeRepository employeeRepository;
     private final DepartmentDAO departmentDAO;
+    private final DepartmentService departmentService;
+    private final JdbcTemplate jdbcTemplate;
 
-    public EmployeeServiceImpl(EmployeeRepository theEmployeeRepository, DepartmentDAO departmentDAO, JdbcTemplate jdbcTemplate) {
+    public EmployeeServiceImpl(EmployeeRepository theEmployeeRepository,
+                               DepartmentDAO departmentDAO, DepartmentService departmentService,
+                               JdbcTemplate jdbcTemplate) {
+
         employeeRepository = theEmployeeRepository;
         this.departmentDAO = departmentDAO;
+        this.departmentService = departmentService;
         this.jdbcTemplate = jdbcTemplate;
     }
-    private final JdbcTemplate jdbcTemplate;
+
 
 
     public Page<Employee> getPaginatedEmployees(int page, int size) {
@@ -59,6 +67,21 @@ public class EmployeeServiceImpl implements EmployeeService {
         jdbcTemplate.update(deleteEmployeeSql, employeeId);  // Deleting the employee using the same ID (assuming it's the same ID for both)
 
         System.out.println("User and Employee deleted for ID: " + employeeId);
+    }
+
+    @Override
+    public void addEmployee(Model model, Authentication authentication) {
+        model.addAttribute(new Employee());
+        List<String> roles;
+        if (authentication.getAuthorities().stream().anyMatch(auth -> "ROLE_ADMIN".equals(auth.getAuthority()))){
+            roles = Arrays.asList("ADMIN", "MANAGER", "EMPLOYEE");
+        }
+        else {
+            roles = Arrays.asList("MANAGER", "EMPLOYEE");
+        }
+        model.addAttribute("roles", roles);
+        List<String> departments = departmentService.findAllNameDepartments();
+        model.addAttribute("departments", departments);
     }
 
 //    @Override
@@ -86,6 +109,9 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public Optional<Employee> findById(int theId) {
 
+        if (theId <= 0) {
+            return Optional.empty();
+        }
         return employeeRepository.findById(theId);
     }
 
@@ -123,6 +149,9 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
         if (theEmployee.getDepartment().equals("IT")) {
             employee.setDepartment_id(departmentDAO.findDepartmentByName("IT"));
+        }
+        if (theEmployee.getDepartment().equals("SALES")) {
+            employee.setDepartment_id(departmentDAO.findDepartmentByName("SALES"));
         }
         employeeRepository.save(employee);
         return employee;

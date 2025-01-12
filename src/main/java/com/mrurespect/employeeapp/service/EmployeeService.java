@@ -3,6 +3,8 @@ package com.mrurespect.employeeapp.service;
 
 import com.mrurespect.employeeapp.entity.Employee;
 import org.springframework.data.domain.Page;
+import org.springframework.security.core.Authentication;
+import org.springframework.ui.Model;
 
 import java.util.List;
 import java.util.Optional;
@@ -22,7 +24,9 @@ public interface EmployeeService {
     Page<Employee> getPaginatedEmployees(int page, int size);
 
     void deleteEmployeeAndUser(int employeeId);
-    
+
+    void addEmployee(Model model, Authentication authentication);
+
     Page<Employee> searchEmployeesByFirstName(String firstName, int page, int size);
 
 }
