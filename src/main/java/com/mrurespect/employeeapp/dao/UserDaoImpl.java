@@ -1,20 +1,29 @@
 package com.mrurespect.employeeapp.dao;
 
+import com.mrurespect.employeeapp.entity.Role;
 import com.mrurespect.employeeapp.entity.User;
 
+import com.mrurespect.employeeapp.service.UserService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public class UserDaoImpl implements UserDao {
     private final EntityManager entityManager;
     private final JdbcTemplate jdbcTemplate;
+    private final PasswordEncoder passwordEncoder;
+    private final RoleDao roleDao;
+    private final UserService userService;
 
-    public UserDaoImpl(EntityManager theEntityManager, JdbcTemplate jdbcTemplate) {
+    public UserDaoImpl(EntityManager theEntityManager, JdbcTemplate jdbcTemplate, PasswordEncoder passwordEncoder, RoleDao roleDao, UserService userService) {
         this.entityManager = theEntityManager;
         this.jdbcTemplate = jdbcTemplate;
+        this.passwordEncoder = passwordEncoder;
+        this.roleDao = roleDao;
+        this.userService = userService;
     }
 
 
@@ -47,6 +56,7 @@ public class UserDaoImpl implements UserDao {
         return jdbcTemplate.update(sql,
                 user.getPassword(), user.getUserName(), user.getRole(), user.getEmployee().getId());
     }
+
 //    @Override
 //    public User save(User user) {
 //        entityManager.persist(user);

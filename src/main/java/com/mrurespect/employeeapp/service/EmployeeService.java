@@ -32,5 +32,5 @@ public interface EmployeeService {
 
     void listEmployees(Model model, Authentication authentication, String firstName, int page, int size);
 
-    Employee postAddEmployee(EmployeeUserDTOImpl employeeUserDTO);
+    Employee postAddEmployee(EmployeeUserDTOImpl employeeUserDTO, String action_type, int id);
 }

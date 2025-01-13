@@ -12,6 +12,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.Arrays;
 import java.util.List;
@@ -90,8 +91,8 @@ public class EmployeeController {
             System.out.println("username already exist");
             return "employee-form";
         }
-
-        Employee savedEmployee = employeeService.postAddEmployee(employeeUserDTO);
+        int id = -1;
+        Employee savedEmployee = employeeService.postAddEmployee(employeeUserDTO, "create", id);
 
 //        userService.postAddUser(usrname, savedEmployee, employeeUserDTO);
 
@@ -113,13 +114,15 @@ public class EmployeeController {
     }
 
     @PostMapping("/saveEmployee")
-    public String saveEmployee(@ModelAttribute EmployeeUserDTOImpl employee,
+    public String saveEmployee(@ModelAttribute EmployeeUserDTOImpl employee, @RequestParam(required = false) int id,
                                  Model model) {
         System.out.println(employee);
-        employeeService.postAddEmployee(employee);
+        Employee new_employee = employeeService.postAddEmployee(employee, "edit", id);
 //        List<String> departments = departmentService.findAllNameDepartments();
 //        model.addAttribute("departments", departments);
 //        return "redirect:/employees/list?page=" + page;
+        model.addAttribute("employee", new_employee);
+
         return "update_employee";
     }
 
@@ -149,55 +152,44 @@ public class EmployeeController {
 
 //    requests
 
+
     @GetMapping("/seeRequets")
-    public String seeRequests(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size, Model model, @Autowired Authentication authentication ) {
-        String username_user = authentication.getName(); // since username is unique
-        if (username_user.equals("admin")){
-            return "see_request";
-        }
-        Page<Request> request_page;
+    public String seeRequests(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size,
+            Model model,
+            @Autowired Authentication authentication
+    ) {
+
+        boolean isAdmin = authentication.getAuthorities().stream()
+                .anyMatch(auth -> "ROLE_ADMIN".equals(auth.getAuthority()));
+        boolean isManager = authentication.getAuthorities().stream()
+                .anyMatch(auth -> "ROLE_MANAGER".equals(auth.getAuthority()));
+
+        model.addAttribute("isAdmin", isAdmin);
+        model.addAttribute("isManager", isManager);
+
+        String username_user = authentication.getName();
         User user = userService.findByUserName(username_user);
-        if (user.getRole().equals("ROLE_MANAGER")) {
+        Page<Request> request_page;
+        if (username_user.equals("admin") || user.getRole().equals("ADMIN")) {
+            request_page = requestService.getAllPaginatedRequests(page, size);
+        }
+        if (user.getRole().equals("MANAGER")) {
             List<Request> departmentRequests = requestService.getRequestsByDepartment(user.getEmployee().getDepartment_id());
             model.addAttribute("requests", departmentRequests);
             request_page = requestService.getPaginatedRequests(page, size, user.getEmployee().getDepartment_id());
-        }
-        else{
+        } else {
             request_page = requestService.getHisRequests(page, size, user.getEmployee());
         }
 
         model.addAttribute("changeId", value);
-        model.addAttribute("requestPage", request_page); // Paginated employee data
+        model.addAttribute("requestPage", request_page);
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", request_page.getTotalPages());
         model.addAttribute(new Request());
         return "see_request";
     }
-
-//    @GetMapping("/seeHisRequests")
-//    public String SeeHisRequests(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size, Model model, @Autowired Authentication authentication ) {
-//        String username_user = authentication.getName(); // since username is unique
-//        if (username_user.equals("admin")){
-//            return "see_request";
-//        }
-//
-//        User user = userService.findByUserName(username_user);
-////        List<Request> departmentRequests = requestService.getHisRequests( page, size, user.getEmployee());
-////        model.addAttribute("requests", departmentRequests);
-//        Page<Request> request_page = requestService.getHisRequests(page, size, user.getEmployee());
-////
-////        // Add attributes to the model
-////        model.addAttribute("firstName", request_page);
-////        model.addAttribute("isManager", isManager);
-//        model.addAttribute("changeId", value);
-//        model.addAttribute("requestPage", request_page); // Paginated employee data
-//        model.addAttribute("currentPage", page);
-//        model.addAttribute("totalPages", request_page.getTotalPages());
-//        model.addAttribute(new Request());
-//
-//        return "see_request";
-//    }
-
 
     @GetMapping("/createRequets")
     public String createRequests(Model model, @Autowired Authentication authentication ) {
@@ -231,6 +223,18 @@ public class EmployeeController {
         model.addAttribute("requestTypes", requestTypes);
         model.addAttribute("employee", new Employee());
         return "create_request";
+    }
+
+    @GetMapping("/AcceptRequest/{id}")
+    public String acceptRequest(@PathVariable Long id, @ModelAttribute RequestDTO requestDAO, Model model, @Autowired Authentication authentication) {
+        requestService.acceptrejectRequest(id, requestDAO, model, authentication, "APPROVED");
+        return "redirect:/employees/seeRequets";
+    }
+
+    @GetMapping("/RejectRequest//{id}")
+    public String rejectRequest(@PathVariable Long id, @ModelAttribute RequestDTO requestDAO, Model model, @Autowired Authentication authentication) {
+        requestService.acceptrejectRequest(id, requestDAO, model, authentication, "REJECTED");
+        return "redirect:/employees/seeRequets";
     }
 
 }

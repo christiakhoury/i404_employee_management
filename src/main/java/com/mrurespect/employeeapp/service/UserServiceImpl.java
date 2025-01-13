@@ -7,6 +7,8 @@ import com.mrurespect.employeeapp.entity.Employee;
 import com.mrurespect.employeeapp.entity.Role;
 import com.mrurespect.employeeapp.entity.User;
 import com.mrurespect.employeeapp.security.WebUser;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -30,6 +32,23 @@ public class UserServiceImpl implements UserService {
 
     private final RoleDao roleDao;
     private final PasswordEncoder passwordEncoder;
+    private EntityManager entityManager;
+
+    @Override
+    public User findByUserName1(String theUserName) {
+
+        // retrieve/read from database using username
+        TypedQuery<User> theQuery = entityManager.createQuery("from User where userName=:uName", User.class);
+        theQuery.setParameter("uName", theUserName);
+
+        User theUser = null;
+        try {
+            theUser = theQuery.getSingleResult();
+        } catch (Exception e) {
+            theUser = null;
+        }
+        return theUser;
+    }
 
 
     public UserServiceImpl(UserDao userDao, RoleDao roleDao, PasswordEncoder passwordEncoder) {
