@@ -1,10 +1,13 @@
 package com.mrurespect.employeeapp.service;
 
+import com.mrurespect.employeeapp.dao.EmployeeUserDTOImpl;
 import com.mrurespect.employeeapp.dao.RoleDao;
 import com.mrurespect.employeeapp.dao.UserDao;
+import com.mrurespect.employeeapp.entity.Employee;
 import com.mrurespect.employeeapp.entity.Role;
 import com.mrurespect.employeeapp.entity.User;
 import com.mrurespect.employeeapp.security.WebUser;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -12,9 +15,11 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.ui.Model;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -25,6 +30,7 @@ public class UserServiceImpl implements UserService {
 
     private final RoleDao roleDao;
     private final PasswordEncoder passwordEncoder;
+
 
     public UserServiceImpl(UserDao userDao, RoleDao roleDao, PasswordEncoder passwordEncoder) {
         this.userDao = userDao;
@@ -38,7 +44,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional
     public User save(WebUser webUser) {
         User user = new User();
 
@@ -88,6 +93,32 @@ public class UserServiceImpl implements UserService {
             webuser.setLastName("admin");
             this.save(webuser); // Save the admin user to the database
             System.out.println("Admin user created with username: admin and password: admin");
+        }
+    }
+
+    @Override
+    public void postAddEmployeeRole(Model model, Authentication authentication, EmployeeUserDTOImpl employeeUserDTO) {
+        model.addAttribute(new Employee());
+        List<String> roles;
+        if (authentication.getAuthorities().stream().anyMatch(auth -> "ROLE_ADMIN".equals(auth.getAuthority()))){
+            roles = Arrays.asList("ADMIN", "MANAGER", "EMPLOYEE");
+        }
+        else {
+            roles = Arrays.asList("MANAGER", "EMPLOYEE");
+        }
+        model.addAttribute("roles", roles);
+    }
+
+    @Override
+    public void postAddUser(User usrname, Employee savedEmployee, EmployeeUserDTOImpl employeeUserDTO) {
+        if (Objects.equals(null, usrname)) {
+            // Create new user
+            WebUser webuser = new WebUser();
+            webuser.setUsername(employeeUserDTO.getUsername());
+            webuser.setPassword(employeeUserDTO.getPassword());
+            webuser.setRole(employeeUserDTO.getRole());
+            webuser.setEmployee(savedEmployee);
+            save(webuser);
         }
     }
 }

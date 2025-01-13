@@ -2,15 +2,19 @@ package com.mrurespect.employeeapp.dao;
 
 import com.mrurespect.employeeapp.entity.User;
 
-import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public class UserDaoImpl implements UserDao {
     private final EntityManager entityManager;
-    public UserDaoImpl(EntityManager theEntityManager) {
+    private final JdbcTemplate jdbcTemplate;
+
+    public UserDaoImpl(EntityManager theEntityManager, JdbcTemplate jdbcTemplate) {
         this.entityManager = theEntityManager;
+        this.jdbcTemplate = jdbcTemplate;
     }
 
 
@@ -37,16 +41,16 @@ public class UserDaoImpl implements UserDao {
         return theUser;
     }
 
-//    public int save(User user) {
-//        sql = "insert into uuser (email, first_name, last_name, password, username, role) " +
-//                "values (?,?,?,?,?,?)";
-//        return jdbcTemplate.update(sql, user.getEmail(), user.getFirstName(), user.getLastName(),
-//                user.getPassword(), user.getUserName(), user.getRole());
-//    }
-    @Override
-    public User save(User user) {
-        entityManager.persist(user);
-        return user;
+    public int save(User user) {
+        String sql = "insert into uuser (password, username, role, employee_id) " +
+                "values (?,?,?,?)";
+        return jdbcTemplate.update(sql,
+                user.getPassword(), user.getUserName(), user.getRole(), user.getEmployee().getId());
     }
+//    @Override
+//    public User save(User user) {
+//        entityManager.persist(user);
+//        return user;
+//    }
 }
 

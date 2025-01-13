@@ -1,15 +1,14 @@
 package com.mrurespect.employeeapp.controller;
 
 import com.mrurespect.employeeapp.dao.EmployeeUserDTOImpl;
-import com.mrurespect.employeeapp.dao.RequestDAOImpl;
 import com.mrurespect.employeeapp.dao.UserDao;
 import com.mrurespect.employeeapp.entity.*;
+import com.mrurespect.employeeapp.entity.dto.RequestDTO;
 import com.mrurespect.employeeapp.security.WebUser;
 import com.mrurespect.employeeapp.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -84,17 +83,7 @@ public String listEmployees(
 
     @GetMapping("/addEmployee")
     public String addEmployee(Model model, @Autowired Authentication authentication) {
-        model.addAttribute(new Employee());
-        List<String> roles;
-        if (authentication.getAuthorities().stream().anyMatch(auth -> "ROLE_ADMIN".equals(auth.getAuthority()))){
-            roles = Arrays.asList("ADMIN", "MANAGER", "EMPLOYEE");
-        }
-        else {
-            roles = Arrays.asList("MANAGER", "EMPLOYEE");
-        }
-        model.addAttribute("roles", roles);
-        List<String> departments = departmentService.findAllNameDepartments();
-        model.addAttribute("departments", departments);
+        employeeService.addEmployee(model, authentication);
         return "employee-form";
     }
 
@@ -102,47 +91,21 @@ public String listEmployees(
     public String addEmployee(@ModelAttribute EmployeeUserDTOImpl employeeUserDTO,
                               Model model,
                               @Autowired Authentication authentication) {
-        User usrname = userDao.findByUserName(employeeUserDTO.getUsername());
 
-        model.addAttribute(new Employee());
-        List<String> roles;
-        if (authentication.getAuthorities().stream().anyMatch(auth -> "ROLE_ADMIN".equals(auth.getAuthority()))){
-            roles = Arrays.asList("ADMIN", "MANAGER", "EMPLOYEE");
-        }
-        else {
-            roles = Arrays.asList("MANAGER", "EMPLOYEE");
-        }
-        model.addAttribute("roles", roles);
-
+        userService.postAddEmployeeRole(model,authentication,employeeUserDTO);
         List<String> departments = departmentService.findAllNameDepartments();
         model.addAttribute("departments", departments);
 
+        User usrname = userDao.findByUserName(employeeUserDTO.getUsername());
         if (!Objects.equals(null, usrname)) {
             model.addAttribute("registrationError", "username already exists");
             System.out.println("username already exist");
             return "employee-form";
         }
 
+        Employee savedEmployee = employeeService.postAddEmployee(employeeUserDTO);
 
-        // Create Employee
-        Employee employee = new Employee();
-        employee.setFirstName(employeeUserDTO.getFirstName());
-        employee.setLastName(employeeUserDTO.getLastName());
-        employee.setEmail(employeeUserDTO.getEmail());
-        employee.setDepartment(employeeUserDTO.getDepartment());
-
-        // Save Employee to DB
-        Employee savedEmployee = employeeService.save(employee);
-
-        if (Objects.equals(null, usrname)) {
-            // Create new user
-            WebUser webuser = new WebUser();
-            webuser.setUsername(employeeUserDTO.getUsername());
-            webuser.setPassword(employeeUserDTO.getPassword());
-            webuser.setRole(employeeUserDTO.getRole());
-            webuser.setEmployee(savedEmployee);
-            userService.save(webuser);
-        }
+//        userService.postAddUser(usrname, savedEmployee, employeeUserDTO);
 
         return "employee-form";
     }
@@ -162,10 +125,10 @@ public String listEmployees(
     }
 
     @PostMapping("/saveEmployee")
-    public String saveEmployee(@ModelAttribute Employee employee,
+    public String saveEmployee(@ModelAttribute EmployeeUserDTOImpl employee,
                                  Model model) {
         System.out.println(employee);
-        employeeService.save(employee);
+        employeeService.postAddEmployee(employee);
 //        List<String> departments = departmentService.findAllNameDepartments();
 //        model.addAttribute("departments", departments);
 //        return "redirect:/employees/list?page=" + page;
@@ -264,52 +227,22 @@ public String listEmployees(
     }
 
     @PostMapping("/employees/createRequest")
-    public String createRequest(@ModelAttribute RequestDAOImpl requestDAO,
+    public String createRequest(@ModelAttribute RequestDTO requestDAO,
                               Model model,
                               @Autowired Authentication authentication) {
-//        User usrname = userDao.findByUserName(RequestDAOImpl.getUsername());
-//
-//        model.addAttribute(new Employee());
-//        List<String> roles;
-//        if (authentication.getAuthorities().stream().anyMatch(auth -> "ROLE_ADMIN".equals(auth.getAuthority()))){
-//            roles = Arrays.asList("ADMIN", "MANAGER", "EMPLOYEE");
-//        }
-//        else {
-//            roles = Arrays.asList("MANAGER", "EMPLOYEE");
-//        }
-//        model.addAttribute("roles", roles);
-//
-//        List<String> departments = departmentService.findAllNameDepartments();
-//        model.addAttribute("departments", departments);
-//
-//        if (!Objects.equals(null, usrname)) {
-//            model.addAttribute("registrationError", "username already exists");
-//            System.out.println("username already exist");
-//            return "employee-form";
-//        }
-//
-//
-//        // Create Employee
-//        Employee employee = new Employee();
-//        employee.setFirstName(employeeUserDTO.getFirstName());
-//        employee.setLastName(employeeUserDTO.getLastName());
-//        employee.setEmail(employeeUserDTO.getEmail());
-//        employee.setDepartment(employeeUserDTO.getDepartment());
-//
-//        // Save Employee to DB
-//        Employee savedEmployee = employeeService.save(employee);
-//
-//        if (Objects.equals(null, usrname)) {
-//            // Create new user
-//            WebUser webuser = new WebUser();
-//            webuser.setUsername(employeeUserDTO.getUsername());
-//            webuser.setPassword(employeeUserDTO.getPassword());
-//            webuser.setRole(employeeUserDTO.getRole());
-//            webuser.setEmployee(savedEmployee);
-//            userService.save(webuser);
-//        }
 
-        return "employee-form";
+        Employee employee_id = userDao.findByUserName(authentication.getName()).getEmployee();
+        Request request_id = new Request();
+        request_id.setEmployee(employee_id);
+        request_id.setName(requestDAO.getName());
+        request_id.setStatus(requestDAO.getStatus());
+        request_id.setRequest_type(requestDAO.getRequest_type());
+        request_id.setRequest_date(requestDAO.getRequest_date());
+        requestService.save(request_id);
+        List<String> requestTypes = requesttTypeService.findAllNameRequestType();
+        model.addAttribute("requestTypes", requestTypes);
+        model.addAttribute("employee", new Employee());
+        return "create_request";
     }
 
 }

@@ -19,7 +19,7 @@
         <br>
         <input type="date" placeholder="Request Date" class="input-group-text" name="request_date" required>
         <br>
-        <input type="hidden" th:field="*{id}"> <!-- employee.id will be automatically set here -->
+        <input type="hidden" th:field="*{id}" th:value="${id}"> <!-- employee.id will be automatically set here -->
         <input type="hidden" name="status" value="PENDING"> <!-- Setting default value for status -->
 
         <button class="btn btn-outline-info my-3" type="submit">save</button>

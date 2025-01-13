@@ -1,11 +1,9 @@
-package com.mrurespect.employeeapp.dao;
-
+package com.mrurespect.employeeapp.entity.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-
 import java.time.LocalDate;
 
-public class RequestDAOImpl implements RequestDto{
+public class RequestDTO {
 
     private String name;
     private String status;

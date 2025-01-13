@@ -13,4 +13,6 @@ public interface RequestService {
     Page<Request> getPaginatedRequests(int page, int size, Department departmentId);
 
     Page<Request> getHisRequests(int page, int size, Employee employee_id);
+
+    void save(Request requestId);
 }

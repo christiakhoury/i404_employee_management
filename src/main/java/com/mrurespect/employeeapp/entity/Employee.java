@@ -1,9 +1,12 @@
 package com.mrurespect.employeeapp.entity;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 
 @Entity
 @Table(name = "employees")
@@ -46,6 +49,7 @@ public class Employee {
 
     @OneToOne(mappedBy = "employee") // Indicates this is the inverse side of the relationship
     private User user_id;
+
 
     public User getUser_id() {
         return user_id;

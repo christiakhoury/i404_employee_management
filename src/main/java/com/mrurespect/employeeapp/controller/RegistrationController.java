@@ -7,8 +7,8 @@ import com.mrurespect.employeeapp.security.WebUser;
 import com.mrurespect.employeeapp.service.EmployeeService;
 import com.mrurespect.employeeapp.service.UserService;
 
-import javax.servlet.http.HttpSession;
-import javax.validation.Valid;
+import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 
 import org.apache.catalina.Store;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,39 +46,39 @@ public class RegistrationController {
 
     //This code performs validation, checks the database to see if the user already exists,
     //creates user and stores in database and finally place in the session for later use.
-    @PostMapping("/processRegistrationForm")
-    public String register(@ModelAttribute("webUser") @Valid WebUser webUser,
-                           BindingResult bindingResult,
-                           HttpSession session,
-                           Model model) {
-        System.out.println("processing registration form for " + webUser);
-
-        //form validation
-        if (bindingResult.hasErrors()) return "register";
-
-        //check the database if the user already exists
-        User existing = userService.findByUserName(webUser.getUsername());
-        if (!Objects.equals(null, existing)) {
-            model.addAttribute("registrationError", "username already exists");
-            System.out.println("username already exist");
-            return "register";
-        }
-        Employee employee = new Employee();
-        employee.setFirstName(webUser.getFirstName());
-        employee.setLastName(webUser.getLastName());
-        employee.setEmail(webUser.getEmail());
-
-        // Save Employee to DB
-        Employee savedEmployee = employeeService.save(employee);
-        webUser.setEmployee(savedEmployee);
-        //create user account and store it in the database
-        userService.save(webUser);
-        System.out.println("successfully created " + webUser);
-
-        //place the user in the http session for later use
-        session.setAttribute("user", webUser);
-        return "register-confirmation";
-    }
+//    @PostMapping("/processRegistrationForm")
+//    public String register(@ModelAttribute("webUser") @Valid WebUser webUser,
+//                           BindingResult bindingResult,
+//                           HttpSession session,
+//                           Model model) {
+//        System.out.println("processing registration form for " + webUser);
+//
+//        //form validation
+//        if (bindingResult.hasErrors()) return "register";
+//
+//        //check the database if the user already exists
+//        User existing = userService.findByUserName(webUser.getUsername());
+//        if (!Objects.equals(null, existing)) {
+//            model.addAttribute("registrationError", "username already exists");
+//            System.out.println("username already exist");
+//            return "register";
+//        }
+//        Employee employee = new Employee();
+//        employee.setFirstName(webUser.getFirstName());
+//        employee.setLastName(webUser.getLastName());
+//        employee.setEmail(webUser.getEmail());
+//
+//        // Save Employee to DB
+//        Employee savedEmployee = employeeService.postAddEmployee(employee);
+//        webUser.setEmployee(savedEmployee);
+//        //create user account and store it in the database
+//        userService.save(webUser);
+//        System.out.println("successfully created " + webUser);
+//
+//        //place the user in the http session for later use
+//        session.setAttribute("user", webUser);
+//        return "register-confirmation";
+//    }
     //The UserService provides access to the database via the UserDao for creating
     //users. We'll also use this bean to check if a user exists.
 

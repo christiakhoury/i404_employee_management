@@ -2,8 +2,9 @@ package com.mrurespect.employeeapp.security;
 
 import com.mrurespect.employeeapp.entity.Employee;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+
 
 public class WebUser {
     @NotNull(message = "username is required")

@@ -76,6 +76,8 @@ CREATE TABLE request (
      id SERIAL PRIMARY KEY,
      description VARCHAR(255),
      employee_id INT,
+     status VARCHAR(25) DEFAULT NULL,
+     request_type VARCHAR(25) DEFAULT NULL,
      request_type_id INT NOT NULL,
      state INT NOT NULL,
      request_date DATE DEFAULT CURRENT_DATE,

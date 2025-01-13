@@ -1,5 +1,8 @@
 package com.mrurespect.employeeapp.service;
 
+import com.mrurespect.employeeapp.dao.EmployeeUserDTOImpl;
+import com.mrurespect.employeeapp.dao.rowMapper.EmployeeMapper;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import com.mrurespect.employeeapp.dao.DepartmentDAO;
@@ -15,8 +18,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.ui.Model;
 
 import java.util.Arrays;
 import java.util.List;
@@ -28,13 +33,22 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     private final EmployeeRepository employeeRepository;
     private final DepartmentDAO departmentDAO;
+    private final DepartmentService departmentService;
+    private final JdbcTemplate jdbcTemplate;
+    private final UserServiceImpl userServiceImpl;
+    private final EmployeeMapper employeeMapper = new EmployeeMapper();
 
-    public EmployeeServiceImpl(EmployeeRepository theEmployeeRepository, DepartmentDAO departmentDAO, JdbcTemplate jdbcTemplate) {
+    public EmployeeServiceImpl(EmployeeRepository theEmployeeRepository,
+                               DepartmentDAO departmentDAO, DepartmentService departmentService,
+                               JdbcTemplate jdbcTemplate, UserServiceImpl userServiceImpl) {
+
         employeeRepository = theEmployeeRepository;
         this.departmentDAO = departmentDAO;
+        this.departmentService = departmentService;
         this.jdbcTemplate = jdbcTemplate;
+        this.userServiceImpl = userServiceImpl;
     }
-    private final JdbcTemplate jdbcTemplate;
+
 
 
     public Page<Employee> getPaginatedEmployees(int page, int size) {
@@ -46,7 +60,6 @@ public class EmployeeServiceImpl implements EmployeeService {
         Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending()); // Adjust sorting as needed
         return employeeRepository.findByFirstName(firstName, pageable);
     }
-
 
     @Override
     public void deleteEmployeeAndUser(int employeeId) {
@@ -61,6 +74,21 @@ public class EmployeeServiceImpl implements EmployeeService {
         System.out.println("User and Employee deleted for ID: " + employeeId);
     }
 
+    @Override
+    public void addEmployee(Model model, Authentication authentication) {
+        model.addAttribute(new Employee());
+        List<String> roles;
+        if (authentication.getAuthorities().stream().anyMatch(auth -> "ROLE_ADMIN".equals(auth.getAuthority()))){
+            roles = Arrays.asList("ADMIN", "MANAGER", "EMPLOYEE");
+        }
+        else {
+            roles = Arrays.asList("MANAGER", "EMPLOYEE");
+        }
+        model.addAttribute("roles", roles);
+        List<String> departments = departmentService.findAllNameDepartments();
+        model.addAttribute("departments", departments);
+    }
+
 //    @Override
 //    public List<Employee> findAll() {
 //        return employeeRepository.findAll();
@@ -69,23 +97,16 @@ public class EmployeeServiceImpl implements EmployeeService {
     public List<Employee> findAll() {
         String sql = "SELECT * FROM employees";
 
-        return jdbcTemplate.query(sql, employeeRowMapper());
+        return jdbcTemplate.query(sql, employeeMapper);
     }
 
-    private RowMapper<Employee> employeeRowMapper() {
-        return (rs, rowNum) -> {
-            Employee employee = new Employee();
-            employee.setId(rs.getInt("id")); // Assuming the column name is 'id'
-            employee.setFirstName(rs.getString("first_name")); // Assuming the column name is 'first_name'
-            employee.setLastName(rs.getString("last_name")); // Assuming the column name is 'last_name'
-            employee.setEmail(rs.getString("email")); // Assuming the column name is 'email'
-            return employee;
-        };
-    }
 
     @Override
     public Optional<Employee> findById(int theId) {
 
+        if (theId <= 0) {
+            return Optional.empty();
+        }
         return employeeRepository.findById(theId);
     }
 
@@ -96,37 +117,11 @@ public class EmployeeServiceImpl implements EmployeeService {
 //        return employeeRepository.save(theEmployee);
 //    }
 
-    @Override
-    @Transactional
-    public Employee save(Employee theEmployee) {
-        Employee employee;
-        if (!Objects.equals(null, theEmployee)){
-            employee = theEmployee;
-        }
-        else {
-            employee = new Employee();
-        }
-
-        employee.setEmail(theEmployee.getEmail());
-        employee.setFirstName(theEmployee.getFirstName());
-        employee.setLastName(theEmployee.getLastName());
-        employee.setDepartment(theEmployee.getDepartment());
-
-        if (theEmployee.getDepartment().equals("HR")) {
-            employee.setDepartment_id(departmentDAO.findDepartmentByName("HR"));
-        }
-        if (theEmployee.getDepartment().equals("DEVELOPMENT")) {
-            employee.setDepartment_id(departmentDAO.findDepartmentByName("DEVELOPMENT"));
-        }
-        if (theEmployee.getDepartment().equals("NETWORKING")) {
-            employee.setDepartment_id(departmentDAO.findDepartmentByName("NETWORKING"));
-        }
-        if (theEmployee.getDepartment().equals("IT")) {
-            employee.setDepartment_id(departmentDAO.findDepartmentByName("IT"));
-        }
-        employeeRepository.save(employee);
-        return employee;
-    }
+//    @Override
+//    @Transactional
+//    public Employee save(Employee theEmployee) {
+//
+//    }
 
     @Override
     public void deleteById(int theId) {
