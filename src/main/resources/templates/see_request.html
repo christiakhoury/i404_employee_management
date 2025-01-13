@@ -20,48 +20,55 @@
     <table class="w-100 table table-light" border="1">
         <thead class="bg-dark">
         <tr class="text-white">
+            <th>Name</th>
             <th>FirstName</th>
             <th>LastName</th>
-            <th>Department</th>
-            <th>Date</th>
+            <th>Request Date</th>
             <th>Type</th>
             <th>State</th>
-            <td th:if="${isAdmin}">~</td>
+            <td th:if="${isAdmin || isManager}">~</td>
+            <td th:if="${isAdmin || isManager}">-</td>
         </tr>
         </thead>
         <tbody th:each="request : ${requestPage.content}">
         <tr>
             <div th:if="${request.getId() != changeId}">
-                <td><input disabled th:value="${request.getEmployee()}"
+                <td><input disabled th:value="${request.getName()}" class="border-0 rounded-pill p-2"></td>
+                <td><input disabled th:value="${request.employee.firstName}"
                            class="border-0 rounded-pill p-2"></td>
-<!--                <td><input disabled th:value="${request.getEmployee().getLastName()}"-->
-<!--                           class="border-0 rounded-pill p-2"></td>-->
+                <td><input disabled th:value="${request.employee.lastName}"
+                           class="border-0 rounded-pill p-2"></td>
                 <td><input disabled th:value="${request.getRequest_date()}"
                            class="border-0 rounded-pill p-2"></td>
                 <td><input disabled th:value="${request.getRequest_type()}"
                            class="border-0 rounded-pill p-2"></td>
                 <td><input disabled th:value="${request.getStatus()}"
                            class="border-0 rounded-pill p-2"></td>
-                <td th:if="${isAdmin}">
-                    <a th:href="@{/employees/showFormForUpdate/{id}(id=${employee.getId()})}" class="btn btn-info">Update</a>
+                <td th:if="${isAdmin || isManager}">
+                    <a th:if="${request.getStatus() == 'PENDING'}" th:href="@{/employees/AcceptRequest/{id}(id=${request.getId()})}" class="btn btn-info">Approve</a>
+                </td>
+                <td th:if="${isAdmin || isManager}">
+                    <a th:if="${request.getStatus() == 'PENDING'}" th:href="@{/employees/RejectRequest/{id}(id=${request.getId()})}" class="btn btn-info">Reject</a>
                 </td>
             </div>
         </tr>
         </tbody>
     </table>
+    <!--    <div th:if="${message}" class="alert alert-success">-->
+    <!--        <span th:text="${message}"></span>-->
+    <!--    </div>-->
+
     <div class="d-flex justify-content-between align-items-center mt-3">
         <span th:text="'Page ' + (${currentPage} + 1) + ' of ' + ${totalPages}"></span>
         <div>
             <a class="btn btn-secondary"
                th:if="${currentPage > 0}"
-               th:href="@{/employees/seeRequets(page=${currentPage - 1})}">
-
+               th:href="@{/employees/seeRequets(page=${currentPage - 1}, size=${5})}">
                 Previous
             </a>
-            <!--               th:href="@{/employees/list(page=${currentPage - 1})}">-->
             <a class="btn btn-secondary"
                th:if="${currentPage + 1 < totalPages}"
-               th:href="@{/employees/seeRequets(page=${currentPage + 1})}">
+               th:href="@{/employees/seeRequets(page=${currentPage + 1}, size=${5})}">
                 Next
             </a>
         </div>
@@ -74,20 +81,3 @@
         </form>
     </div>
 </div>
-<!--    -->
-<!--<table>-->
-<!--    <thead>-->
-<!--    <tr>-->
-<!--        <th>Employee Name</th>-->
-<!--        <th>Request Details</th>-->
-<!--    </tr>-->
-<!--    </thead>-->
-<!--    <tbody>-->
-<!--    <tr th:each="request : ${requests}">-->
-<!--        <td th:text="${request.employee.firstName} + ' ' + ${request.employee.lastName}"></td>-->
-<!--&lt;!&ndash;        <td th:text="${request.details}"></td>&ndash;&gt;-->
-<!--    </tr>-->
-<!--    </tbody>-->
-<!--</table>-->
-<!--</body>-->
-<!--</html>-->

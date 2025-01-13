@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public class RequestStateDAO {
-     private final EntityManager entityManager;
+    private final EntityManager entityManager;
 
     public RequestStateDAO(EntityManager entityManager) {
         this.entityManager = entityManager;
@@ -31,4 +31,3 @@ public class RequestStateDAO {
         entityManager.persist(requestType);
     }
 }
-
