@@ -40,39 +40,38 @@ public class EmployeeController {
     }
 
     @GetMapping("/list")
-public String listEmployees(
-    @RequestParam(defaultValue = "0") int page,
-    @RequestParam(defaultValue = "5") int size,
-    @RequestParam(required = false) String firstName,
-    Model model,
-    @Autowired Authentication authentication) {
+    public String listEmployees(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(required = false) String firstName,
+            Model model,
+            @Autowired Authentication authentication) {
 
-    // Determine roles
-    boolean isAdmin = authentication.getAuthorities().stream()
-            .anyMatch(auth -> "ROLE_ADMIN".equals(auth.getAuthority()));
-    boolean isManager = authentication.getAuthorities().stream()
-            .anyMatch(auth -> "ROLE_MANAGER".equals(auth.getAuthority()));
+        // Determine roles
+        boolean isAdmin = authentication.getAuthorities().stream()
+                .anyMatch(auth -> "ROLE_ADMIN".equals(auth.getAuthority()));
+        boolean isManager = authentication.getAuthorities().stream()
+                .anyMatch(auth -> "ROLE_MANAGER".equals(auth.getAuthority()));
 
-    Page<Employee> employeePage;
+        Page<Employee> employeePage;
 
-    // Handle search by firstName
-    if (firstName != null && !firstName.isEmpty()) {
-        employeePage = employeeService.searchEmployeesByFirstName(firstName, page, size); // Use paginated search
-    } else {
-        employeePage = employeeService.getPaginatedEmployees(page, size);
+        // Handle search by firstName
+        if (firstName != null && !firstName.isEmpty()) {
+            employeePage = employeeService.searchEmployeesByFirstName(firstName, page, size); // Use paginated search
+        } else {
+            employeePage = employeeService.getPaginatedEmployees(page, size);
+        }
+
+        model.addAttribute("employeePage", employeePage);
+        model.addAttribute("isAdmin", isAdmin);
+        model.addAttribute("isManager", isManager);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", employeePage.getTotalPages());
+        model.addAttribute("firstName", firstName);  // Preserve the search term in the input field
+        model.addAttribute(new Employee());  // Create a new Employee object for the form
+
+        return "list-employee";
     }
-
-    model.addAttribute("employeePage", employeePage);
-    model.addAttribute("isAdmin", isAdmin);
-    model.addAttribute("isManager", isManager);
-    model.addAttribute("currentPage", page);
-    model.addAttribute("totalPages", employeePage.getTotalPages());
-    model.addAttribute("firstName", firstName);  // Preserve the search term in the input field
-    model.addAttribute(new Employee());  // Create a new Employee object for the form
-
-    return "list-employee";
-}
-
 
 
 
@@ -83,32 +82,71 @@ public String listEmployees(
 
     @GetMapping("/addEmployee")
     public String addEmployee(Model model, @Autowired Authentication authentication) {
-        employeeService.addEmployee(model, authentication);
+        model.addAttribute(new Employee());
+        List<String> roles;
+        if (authentication.getAuthorities().stream().anyMatch(auth -> "ROLE_ADMIN".equals(auth.getAuthority()))){
+            roles = Arrays.asList("ADMIN", "MANAGER", "EMPLOYEE");
+        }
+        else {
+            roles = Arrays.asList("MANAGER", "EMPLOYEE");
+        }
+        model.addAttribute("roles", roles);
+        List<String> departments = departmentService.findAllNameDepartments();
+        model.addAttribute("departments", departments);
         return "employee-form";
+
     }
+
 
     @PostMapping("/employees/add")
     public String addEmployee(@ModelAttribute EmployeeUserDTOImpl employeeUserDTO,
                               Model model,
                               @Autowired Authentication authentication) {
+        User usrname = userDao.findByUserName(employeeUserDTO.getUsername());
 
-        userService.postAddEmployeeRole(model,authentication,employeeUserDTO);
+        model.addAttribute(new Employee());
+        List<String> roles;
+        if (authentication.getAuthorities().stream().anyMatch(auth -> "ROLE_ADMIN".equals(auth.getAuthority()))){
+            roles = Arrays.asList("ADMIN", "MANAGER", "EMPLOYEE");
+        }
+        else {
+            roles = Arrays.asList("MANAGER", "EMPLOYEE");
+        }
+        model.addAttribute("roles", roles);
+
         List<String> departments = departmentService.findAllNameDepartments();
         model.addAttribute("departments", departments);
 
-        User usrname = userDao.findByUserName(employeeUserDTO.getUsername());
         if (!Objects.equals(null, usrname)) {
             model.addAttribute("registrationError", "username already exists");
             System.out.println("username already exist");
             return "employee-form";
         }
 
-        Employee savedEmployee = employeeService.postAddEmployee(employeeUserDTO);
 
-//        userService.postAddUser(usrname, savedEmployee, employeeUserDTO);
+        // Create Employee
+        Employee employee = new Employee();
+        employee.setFirstName(employeeUserDTO.getFirstName());
+        employee.setLastName(employeeUserDTO.getLastName());
+        employee.setEmail(employeeUserDTO.getEmail());
+        employee.setDepartment(employeeUserDTO.getDepartment());
+
+        // Save Employee to DB
+        Employee savedEmployee = employeeService.save(employee);
+
+        if (Objects.equals(null, usrname)) {
+            // Create new user
+            WebUser webuser = new WebUser();
+            webuser.setUsername(employeeUserDTO.getUsername());
+            webuser.setPassword(employeeUserDTO.getPassword());
+            webuser.setRole(employeeUserDTO.getRole());
+            webuser.setEmployee(savedEmployee);
+            userService.save(webuser);
+        }
 
         return "employee-form";
     }
+
 
     @GetMapping("/showFormForUpdate/{id}")
     public String showFormForUpdate(@PathVariable ( value = "id") int id, Model model) {
@@ -125,10 +163,10 @@ public String listEmployees(
     }
 
     @PostMapping("/saveEmployee")
-    public String saveEmployee(@ModelAttribute EmployeeUserDTOImpl employee,
-                                 Model model) {
+    public String saveEmployee(@ModelAttribute Employee employee,
+                               Model model) {
         System.out.println(employee);
-        employeeService.postAddEmployee(employee);
+        employeeService.save(employee);
 //        List<String> departments = departmentService.findAllNameDepartments();
 //        model.addAttribute("departments", departments);
 //        return "redirect:/employees/list?page=" + page;

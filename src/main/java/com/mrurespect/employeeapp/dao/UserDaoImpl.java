@@ -4,6 +4,7 @@ import com.mrurespect.employeeapp.entity.User;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
+import jakarta.transaction.Transactional;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -41,16 +42,17 @@ public class UserDaoImpl implements UserDao {
         return theUser;
     }
 
-    public int save(User user) {
-        String sql = "insert into uuser (password, username, role, employee_id) " +
-                "values (?,?,?,?)";
-        return jdbcTemplate.update(sql,
-                user.getPassword(), user.getUserName(), user.getRole(), user.getEmployee().getId());
-    }
-//    @Override
-//    public User save(User user) {
-//        entityManager.persist(user);
-//        return user;
+//    public int save(User user) {
+//        String sql = "insert into uuser (password, username, role, employee_id) " +
+//                "values (?,?,?,?)";
+//        return jdbcTemplate.update(sql,
+//                user.getPassword(), user.getUserName(), user.getRole(), user.getEmployee().getId());
 //    }
+    @Transactional
+    @Override
+    public User save(User user) {
+        entityManager.persist(user);
+        return user;
+    }
 }
 
