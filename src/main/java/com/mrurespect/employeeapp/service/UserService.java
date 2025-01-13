@@ -10,6 +10,8 @@ import org.springframework.ui.Model;
 
 public interface UserService extends UserDetailsService {
 
+    User findByUserName1(String theUserName);
+
     User findByUserName(String userName);
 
     User save(WebUser webUser);

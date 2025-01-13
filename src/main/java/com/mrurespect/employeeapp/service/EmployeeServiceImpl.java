@@ -1,12 +1,10 @@
 package com.mrurespect.employeeapp.service;
 
-import com.mrurespect.employeeapp.dao.EmployeeUserDTOImpl;
+import com.mrurespect.employeeapp.dao.*;
 import com.mrurespect.employeeapp.dao.rowMapper.EmployeeMapper;
+import com.mrurespect.employeeapp.entity.Role;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import com.mrurespect.employeeapp.dao.DepartmentDAO;
-import com.mrurespect.employeeapp.dao.EmployeeRepository;
-import com.mrurespect.employeeapp.dao.RoleDao;
 import com.mrurespect.employeeapp.entity.Employee;
 import com.mrurespect.employeeapp.entity.User;
 import com.mrurespect.employeeapp.security.WebUser;
@@ -36,16 +34,18 @@ public class EmployeeServiceImpl implements EmployeeService {
     private final JdbcTemplate jdbcTemplate;
     private final UserServiceImpl userServiceImpl;
     private final EmployeeMapper employeeMapper = new EmployeeMapper();
+    private final RoleDao  roleDao;
 
     public EmployeeServiceImpl(EmployeeRepository theEmployeeRepository,
                                DepartmentDAO departmentDAO, DepartmentService departmentService,
-                               JdbcTemplate jdbcTemplate, UserServiceImpl userServiceImpl) {
+                               JdbcTemplate jdbcTemplate, UserServiceImpl userServiceImpl, RoleDao roleDao) {
 
         employeeRepository = theEmployeeRepository;
         this.departmentDAO = departmentDAO;
         this.departmentService = departmentService;
         this.jdbcTemplate = jdbcTemplate;
         this.userServiceImpl = userServiceImpl;
+        this.roleDao = roleDao;
     }
 
 
@@ -76,7 +76,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public Employee postAddEmployee(EmployeeUserDTOImpl employeeUserDTO) {
+    public Employee postAddEmployee(EmployeeUserDTOImpl employeeUserDTO, String action_type, int id) {
         // Create Employee
         Employee theEmployee = new Employee();
         theEmployee.setFirstName(employeeUserDTO.getFirstName());
@@ -91,6 +91,10 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
         else {
             employee = new Employee();
+        }
+
+        if (id > -1){
+            employee.setId(id);
         }
 
         employee.setEmail(theEmployee.getEmail());
@@ -116,13 +120,30 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         Employee employeessss = employeeRepository.save(employee);
 
-        WebUser user = new WebUser();
-        user.setUsername(employeeUserDTO.getUsername());
-        user.setPassword(employeeUserDTO.getPassword());
-        user.setEmployee(employeessss);
-        user.setRole(employeeUserDTO.getRole());
+        if (action_type.equals("create")) {
+            WebUser user = new WebUser();
+            user.setUsername(employeeUserDTO.getUsername());
+            user.setPassword(employeeUserDTO.getPassword());
+            user.setEmployee(employeessss);
+            user.setRole(employeeUserDTO.getRole());
 
-        userServiceImpl.save(user);
+            User new_user = userServiceImpl.save(user);
+//            String rolesSql = "INSERT INTO users_roles (user_id, role_id) VALUES (?, ?)";
+//
+//            String role = "ROLE_EMPLOYEE";
+//            if (new_user.getRole().equals("ADMIN")){
+//                role = "ROLE_ADMIN";
+//            } else if (new_user.getRole().equals("MANAGER")) {
+//                role = "ROLE_MANAGER";
+//            }
+//            else{
+//                role = "ROLE_EMPLOYEE";
+//            }
+//            Role role_id = roleDao.findRoleByName(role);
+//            User usr_id = userServiceImpl.findByUserName1(new_user.getUserName());
+//            jdbcTemplate.update(rolesSql, usr_id.getId(), role_id.getId());
+
+        }
         return employeessss;
 //        return savedEmployee;
     }
