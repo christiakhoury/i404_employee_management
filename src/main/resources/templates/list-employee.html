@@ -20,13 +20,44 @@
         <a class="btn btn-info mb-3"
            th:href="@{/employees/createRequets}">Create Requests</a>
     </div>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <form th:action="@{/employees/list}" method="get" class="d-flex">
+            <input 
+                type="text" 
+                name="firstName" 
+                placeholder="Search by firstName" 
+                class="form-control me-2" 
+                th:value="${firstName}">
+            <button type="submit" class="btn btn-primary">Search</button>
+        </form>
+    </div>
     <table class="w-100 table table-light" border="1">
         <thead class="bg-dark">
         <tr class="text-white">
-            <th>FirstName</th>
-            <th>LastName</th>
-            <th>Email</th>
-            <th>Department</th>
+            <th>
+                <a href="#" th:href="@{/employees/list(page=0, size=5, sortField='firstName', sortDirection=${sortDirection == 'asc' ? 'desc' : 'asc'})}">
+                    First Name
+                    <span th:text="${sortField == 'firstName' ? (sortDirection == 'asc' ? '↑' : '↓') : ''}"></span>
+                </a>
+            </th>
+            <th>
+                <a href="#" th:href="@{/employees/list(page=0, size=5, sortField='lastName', sortDirection=${sortDirection == 'asc' ? 'desc' : 'asc'})}">
+                    Last Name
+                    <span th:text="${sortField == 'lastName' ? (sortDirection == 'asc' ? '↑' : '↓') : ''}"></span>
+                </a>
+            </th>
+            <th>
+                <a href="#" th:href="@{/employees/list(page=0, size=5, sortField='email', sortDirection=${sortDirection == 'asc' ? 'desc' : 'asc'})}">
+                    Email
+                    <span th:text="${sortField == 'email' ? (sortDirection == 'asc' ? '↑' : '↓') : ''}"></span>
+                </a>
+            </th>
+            <th>
+                <a href="#" th:href="@{/employees/list(page=0, size=5, sortField='department', sortDirection=${sortDirection == 'asc' ? 'desc' : 'asc'})}">
+                    Department
+                    <span th:text="${sortField == 'department' ? (sortDirection == 'asc' ? '↑' : '↓') : ''}"></span>
+                </a>
+            </th>
             <td th:if="${isAdmin}">~</td>
             <td th:if="${isAdmin}">-</td>
         </tr>
@@ -34,26 +65,17 @@
         <tbody th:each="employee : ${employeePage.content}">
         <tr>
             <div th:if="${employee.getId() != changeId}">
-                <td><input disabled th:value="${employee.getFirstName()}"
-                           class="border-0 rounded-pill p-2"></td>
-                <td><input disabled th:value="${employee.getLastName()}"
-                           class="border-0 rounded-pill p-2"></td>
-                <td><input disabled th:value="${employee.getEmail()}"
-                           class="border-0 rounded-pill p-2"></td>
-                <td><input disabled th:value="${employee.getDepartment()}"
-                           class="border-0 rounded-pill p-2"></td>
+                <td><input disabled th:value="${employee.getFirstName()}" class="border-0 rounded-pill p-2"></td>
+                <td><input disabled th:value="${employee.getLastName()}" class="border-0 rounded-pill p-2"></td>
+                <td><input disabled th:value="${employee.getEmail()}" class="border-0 rounded-pill p-2"></td>
+                <td><input disabled th:value="${employee.getDepartment()}" class="border-0 rounded-pill p-2"></td>
                 <td th:if="${isAdmin}">
-<!--                    <a th:href="@{/employees/enableChange/{id}(id=${employee.getId()})}"-->
-<!--                    class="btn btn-info"> update </a>-->
-<!--                    <a th:href="@{/employees/enableChange/{id}(id=${employee.getId()}, page=${currentPage})}"-->
-<!--                       class="btn btn-info">update</a>-->
                     <a th:href="@{/employees/showFormForUpdate/{id}(id=${employee.getId()})}" class="btn btn-info">Update</a>
                 </td>
             </div>
             <td th:if="${isAdmin}">
                 <button class="btn btn-danger" th:data-name="${employee.getId()}"
-                        th:onclick="deleteEmployee(this.getAttribute('data-name'))">delete
-                </button>
+                        th:onclick="deleteEmployee(this.getAttribute('data-name'))">delete</button>
             </td>
         </tr>
         </tbody>
@@ -64,19 +86,16 @@
         <div>
             <a class="btn btn-secondary"
                th:if="${currentPage > 0}"
-               th:href="@{/employees/list(page=${currentPage - 1})}">
-
+               th:href="@{/employees/list(page=${currentPage - 1}, sortField=${sortField}, sortDirection=${sortDirection})}">
                 Previous
             </a>
-<!--               th:href="@{/employees/list(page=${currentPage - 1})}">-->
             <a class="btn btn-secondary"
                th:if="${currentPage + 1 < totalPages}"
-               th:href="@{/employees/list(page=${currentPage + 1})}">
+               th:href="@{/employees/list(page=${currentPage + 1}, sortField=${sortField}, sortDirection=${sortDirection})}">
                 Next
             </a>
         </div>
     </div>
-
 
     <div class="position-absolute top-0 end-0 my-2 d-flex">
         <form action="#" th:action="@{/logout}" method="post">

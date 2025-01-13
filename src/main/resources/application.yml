@@ -13,7 +13,8 @@
 #spring.jpa.hibernate.ddl-auto=update
 #spring.main.banner-mode=off
 
-
+server:
+  port: 8081
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/db_project_3
