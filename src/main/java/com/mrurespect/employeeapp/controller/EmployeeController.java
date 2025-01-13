@@ -40,28 +40,40 @@ public class EmployeeController {
     }
 
     @GetMapping("/list")
-    public String listEmployees(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int size,
-            @RequestParam(required = false) String firstName,
-            Model model,
-            @Autowired Authentication authentication) {
+public String listEmployees(
+    @RequestParam(defaultValue = "0") int page,
+    @RequestParam(defaultValue = "5") int size,
+    @RequestParam(required = false) String firstName,
+    Model model,
+    @Autowired Authentication authentication) {
 
-        employeeService.listEmployees(model, authentication, firstName, page, size);
-        Page<Employee> employeePage;
+    // Determine roles
+    boolean isAdmin = authentication.getAuthorities().stream()
+            .anyMatch(auth -> "ROLE_ADMIN".equals(auth.getAuthority()));
+    boolean isManager = authentication.getAuthorities().stream()
+            .anyMatch(auth -> "ROLE_MANAGER".equals(auth.getAuthority()));
 
-        // Handle search by firstName
-        if (firstName != null && !firstName.isEmpty()) {
-            employeePage = employeeService.searchEmployeesByFirstName(firstName, page, size); // Use paginated search
-        } else {
-            employeePage = employeeService.getPaginatedEmployees(page, size);
-        }
+    Page<Employee> employeePage;
 
-        model.addAttribute("employeePage", employeePage);
-        model.addAttribute("totalPages", employeePage.getTotalPages());
+    // Handle search by firstName
+    if (firstName != null && !firstName.isEmpty()) {
+        employeePage = employeeService.searchEmployeesByFirstName(firstName, page, size); // Use paginated search
+    } else {
+        employeePage = employeeService.getPaginatedEmployees(page, size);
+    }
 
-        return "list-employee";
+    model.addAttribute("employeePage", employeePage);
+    model.addAttribute("isAdmin", isAdmin);
+    model.addAttribute("isManager", isManager);
+    model.addAttribute("currentPage", page);
+    model.addAttribute("totalPages", employeePage.getTotalPages());
+    model.addAttribute("firstName", firstName);  // Preserve the search term in the input field
+    model.addAttribute(new Employee());  // Create a new Employee object for the form
+
+    return "list-employee";
 }
+
+
 
 
     @GetMapping("/")

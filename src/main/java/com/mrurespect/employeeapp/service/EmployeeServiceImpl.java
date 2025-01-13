@@ -2,6 +2,7 @@ package com.mrurespect.employeeapp.service;
 
 import com.mrurespect.employeeapp.dao.EmployeeUserDTOImpl;
 import com.mrurespect.employeeapp.dao.rowMapper.EmployeeMapper;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import com.mrurespect.employeeapp.dao.DepartmentDAO;
@@ -59,74 +60,6 @@ public class EmployeeServiceImpl implements EmployeeService {
         Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending()); // Adjust sorting as needed
         return employeeRepository.findByFirstName(firstName, pageable);
     }
-
-    @Override
-    public void listEmployees(Model model, Authentication authentication, String firstName, int page, int size) {
-        // Determine roles
-        boolean isAdmin = authentication.getAuthorities().stream()
-                .anyMatch(auth -> "ROLE_ADMIN".equals(auth.getAuthority()));
-        boolean isManager = authentication.getAuthorities().stream()
-                .anyMatch(auth -> "ROLE_MANAGER".equals(auth.getAuthority()));
-
-        model.addAttribute("isAdmin", isAdmin);
-        model.addAttribute("isManager", isManager);
-        model.addAttribute("currentPage", page);
-        model.addAttribute("firstName", firstName);  // Preserve the search term in the input field
-        model.addAttribute(new Employee());  // Create a new Employee object for the form
-    }
-
-    @Override
-    public Employee postAddEmployee(EmployeeUserDTOImpl employeeUserDTO) {
-        // Create Employee
-        Employee theEmployee = new Employee();
-        theEmployee.setFirstName(employeeUserDTO.getFirstName());
-        theEmployee.setLastName(employeeUserDTO.getLastName());
-        theEmployee.setEmail(employeeUserDTO.getEmail());
-        theEmployee.setDepartment(employeeUserDTO.getDepartment());
-
-        // Save Employee to DB
-        Employee employee;
-        if (!Objects.equals(null, theEmployee)){
-            employee = theEmployee;
-        }
-        else {
-            employee = new Employee();
-        }
-
-        employee.setEmail(theEmployee.getEmail());
-        employee.setFirstName(theEmployee.getFirstName());
-        employee.setLastName(theEmployee.getLastName());
-        employee.setDepartment(theEmployee.getDepartment());
-
-        if (theEmployee.getDepartment().equals("HR")) {
-            employee.setDepartment_id(departmentDAO.findDepartmentByName("HR"));
-        }
-        if (theEmployee.getDepartment().equals("DEVELOPMENT")) {
-            employee.setDepartment_id(departmentDAO.findDepartmentByName("DEVELOPMENT"));
-        }
-        if (theEmployee.getDepartment().equals("NETWORKING")) {
-            employee.setDepartment_id(departmentDAO.findDepartmentByName("NETWORKING"));
-        }
-        if (theEmployee.getDepartment().equals("IT")) {
-            employee.setDepartment_id(departmentDAO.findDepartmentByName("IT"));
-        }
-        if (theEmployee.getDepartment().equals("SALES")) {
-            employee.setDepartment_id(departmentDAO.findDepartmentByName("SALES"));
-        }
-
-        Employee employeessss = employeeRepository.save(employee);
-
-        WebUser user = new WebUser();
-        user.setUsername(employeeUserDTO.getUsername());
-        user.setPassword(employeeUserDTO.getPassword());
-        user.setEmployee(employeessss);
-        user.setRole(employeeUserDTO.getRole());
-
-        userServiceImpl.save(user);
-        return employeessss;
-//        return savedEmployee;
-    }
-
 
     @Override
     public void deleteEmployeeAndUser(int employeeId) {

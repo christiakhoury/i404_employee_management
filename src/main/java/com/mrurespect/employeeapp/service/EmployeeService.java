@@ -25,12 +25,7 @@ public interface EmployeeService {
     Page<Employee> getPaginatedEmployees(int page, int size);
 
     void deleteEmployeeAndUser(int employeeId);
-
-    void addEmployee(Model model, Authentication authentication);
-
+    
     Page<Employee> searchEmployeesByFirstName(String firstName, int page, int size);
 
-    void listEmployees(Model model, Authentication authentication, String firstName, int page, int size);
-
-    Employee postAddEmployee(EmployeeUserDTOImpl employeeUserDTO);
 }
