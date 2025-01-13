@@ -73,8 +73,6 @@ public class EmployeeController {
         return "list-employee";
     }
 
-
-
     @GetMapping("/")
     public String redirect() {
         return "redirect:/employees/list";
@@ -96,7 +94,6 @@ public class EmployeeController {
         return "employee-form";
 
     }
-
 
     @PostMapping("/employees/add")
     public String addEmployee(@ModelAttribute EmployeeUserDTOImpl employeeUserDTO,
@@ -122,7 +119,6 @@ public class EmployeeController {
             System.out.println("username already exist");
             return "employee-form";
         }
-
 
         // Create Employee
         Employee employee = new Employee();
@@ -171,7 +167,6 @@ public class EmployeeController {
 
         model.addAttribute("selectedDepartment", employee.getDepartment());
 
-//        return "redirect:/employees/list?page=" + page;
         List<String> departments = departmentService.findAllNameDepartments();
         model.addAttribute("departments", departments);
         return "update_employee";
@@ -261,19 +256,6 @@ public class EmployeeController {
         model.addAttribute("requestPage", request_page);
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", request_page.getTotalPages());
-
-
-
-//        Page<Request> request_page;
-//        if (username_user.equals("admin") || user.getRole().equals("ADMIN")) {
-//            request_page = requestService.getAllPaginatedRequests(page, size);
-//        } else if (user.getRole().equals("MANAGER")) {
-//            List<Request> departmentRequests = requestService.getRequestsByDepartment(user.getEmployee().getDepartment_id());
-//            model.addAttribute("requests", departmentRequests);
-//            request_page = requestService.getPaginatedRequests(page, size, user.getEmployee().getDepartment_id());
-//        } else {
-//            request_page = requestService.getHisRequests(page, size, user.getEmployee());
-//        }
 
         model.addAttribute("changeId", value);
         model.addAttribute("requestPage", request_page);

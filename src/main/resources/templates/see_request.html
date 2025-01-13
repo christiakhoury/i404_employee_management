@@ -2,13 +2,16 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
-    <title>Add Employee</title>
+    <title>Requests</title>
     <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
 </head>
 <body>
 <div class="vh-100 container position-relative">
-    <h3>Requests</h3>
+
+    <h3 class="text-center my-4">Requests</h3>
     <hr>
+
+    <!-- Filter Form -->
     <div>
         <form method="get" th:action="@{/employees/seeRequets}">
             <div class="input-group mb-3">
@@ -24,64 +27,55 @@
         </form>
     </div>
 
-    <div>
-        <a sec:authorize="hasAnyRole('MANAGER','ADMIN')" class="btn btn-info mb-3"
+    <!-- Action Buttons -->
+    <div class="mb-3">
+        <a sec:authorize="hasAnyRole('MANAGER','ADMIN')" class="btn btn-info me-2"
            th:href="@{/employees/addEmployee}">Add Employee</a>
-
-        <a class="btn btn-info mb-3"
-           th:href="@{/}">List Employees</a>
+        <a class="btn btn-info" th:href="@{/}">List Employees</a>
     </div>
 
-    <table class="w-100 table table-light" border="1">
-        <thead class="bg-dark">
-        <tr class="text-white">
+    <!-- Table of Requests -->
+    <table class="table table-bordered table-striped table-hover w-100">
+        <thead class="bg-dark text-white">
+        <tr>
             <th>Name</th>
-            <th>FirstName</th>
-            <th>LastName</th>
+            <th>First Name</th>
+            <th>Last Name</th>
             <th>Request Date</th>
             <th>Type</th>
             <th>State</th>
-            <td th:if="${isAdmin || isManager}">~</td>
-            <td th:if="${isAdmin || isManager}">-</td>
+            <th th:if="${isAdmin || isManager}">~</th>
+            <th th:if="${isAdmin || isManager}">-</th>
         </tr>
         </thead>
         <tbody th:each="request : ${requestPage.content}">
         <tr>
-            <div th:if="${request.getId() != changeId}">
-                <td><input disabled th:value="${request.getName()}" class="border-0 rounded-pill p-2"></td>
-                <td><input disabled th:value="${request.employee.firstName}"
-                           class="border-0 rounded-pill p-2"></td>
-                <td><input disabled th:value="${request.employee.lastName}"
-                           class="border-0 rounded-pill p-2"></td>
-                <td><input disabled th:value="${request.getRequest_date()}"
-                           class="border-0 rounded-pill p-2"></td>
-                <td><input disabled th:value="${request.getRequest_type()}"
-                           class="border-0 rounded-pill p-2"></td>
-                <td><input disabled th:value="${request.getStatus()}"
-                           class="border-0 rounded-pill p-2"></td>
-                <td th:if="${isAdmin || isManager}">
-                    <a th:if="${request.getStatus() == 'PENDING'}" th:href="@{/employees/AcceptRequest/{id}(id=${request.getId()})}" class="btn btn-info">Approve</a>
-                </td>
-                <td th:if="${isAdmin || isManager}">
-                    <a th:if="${request.getStatus() == 'PENDING'}" th:href="@{/employees/RejectRequest/{id}(id=${request.getId()})}" class="btn btn-info">Reject</a>
-                </td>
-            </div>
+            <td><input disabled th:value="${request.getName()}" class="border-0 rounded-pill p-2"></td>
+            <td><input disabled th:value="${request.employee.firstName}" class="border-0 rounded-pill p-2"></td>
+            <td><input disabled th:value="${request.employee.lastName}" class="border-0 rounded-pill p-2"></td>
+            <td><input disabled th:value="${request.getRequest_date()}" class="border-0 rounded-pill p-2"></td>
+            <td><input disabled th:value="${request.getRequest_type()}" class="border-0 rounded-pill p-2"></td>
+            <td><input disabled th:value="${request.getStatus()}" class="border-0 rounded-pill p-2"></td>
+            <td th:if="${isAdmin || isManager}">
+                <a th:if="${request.getStatus() == 'PENDING'}" th:href="@{/employees/AcceptRequest/{id}(id=${request.getId()})}" class="btn btn-info btn-sm">Approve</a>
+            </td>
+            <td th:if="${isAdmin || isManager}">
+                <a th:if="${request.getStatus() == 'PENDING'}" th:href="@{/employees/RejectRequest/{id}(id=${request.getId()})}" class="btn btn-info btn-sm">Reject</a>
+            </td>
         </tr>
         </tbody>
     </table>
-    <!--    <div th:if="${message}" class="alert alert-success">-->
-    <!--        <span th:text="${message}"></span>-->
-    <!--    </div>-->
 
+    <!-- Pagination -->
     <div class="d-flex justify-content-between align-items-center mt-3">
         <span th:text="'Page ' + (${currentPage} + 1) + ' of ' + ${totalPages}"></span>
         <div>
-            <a class="btn btn-secondary"
+            <a class="btn btn-secondary btn-sm"
                th:if="${currentPage > 0}"
                th:href="@{/employees/seeRequets(page=${currentPage - 1}, size=${5})}">
                 Previous
             </a>
-            <a class="btn btn-secondary"
+            <a class="btn btn-secondary btn-sm"
                th:if="${currentPage + 1 < totalPages}"
                th:href="@{/employees/seeRequets(page=${currentPage + 1}, size=${5})}">
                 Next
@@ -89,6 +83,30 @@
         </div>
     </div>
 
+    <!-- Logout Button -->
+    <div class="position-absolute top-0 end-0 my-2 d-flex">
+        <form action="#" th:action="@{/logout}" method="post">
+            <input class="btn btn-outline-secondary" type="submit" value="Logout"/>
+        </form>
+    </div>
+</div>
+
+</body>
+</html>
+
+
+
+<!--<!DOCTYPE html>-->
+<!--<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">-->
+<!--<head>-->
+<!--    <meta charset="UTF-8">-->
+<!--    <title>Add Employee</title>-->
+<!--    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">-->
+<!--</head>-->
+<!--<body>-->
+<!--<div class="vh-100 container position-relative">-->
+<!--    <h3>Requests</h3>-->
+<!--    <hr>-->
 <!--    <div>-->
 <!--        <form method="get" th:action="@{/employees/seeRequets}">-->
 <!--            <div class="input-group mb-3">-->
@@ -99,16 +117,96 @@
 <!--                    <option value="PENDING" th:selected="${statusFilter == 'PENDING'}">Pending</option>-->
 <!--                </select>-->
 <!--                <input type="hidden" name="page" th:value="${currentPage}">-->
-<!--                <input type="hidden" name="size" value="5">-->
 <!--                <button class="btn btn-primary" type="submit">Filter</button>-->
 <!--            </div>-->
 <!--        </form>-->
 <!--    </div>-->
 
+<!--    <div>-->
+<!--        <a sec:authorize="hasAnyRole('MANAGER','ADMIN')" class="btn btn-info mb-3"-->
+<!--           th:href="@{/employees/addEmployee}">Add Employee</a>-->
 
-    <div class="position-absolute top-0 end-0 my-2 d-flex">
-        <form action="#" th:action="@{/logout}" method="post">
-            <input class="btn btn-outline-secondary" type="submit" value="logout"/>
-        </form>
-    </div>
-</div>
+<!--        <a class="btn btn-info mb-3"-->
+<!--           th:href="@{/}">List Employees</a>-->
+<!--    </div>-->
+
+<!--    <table class="w-100 table table-light" border="1">-->
+<!--        <thead class="bg-dark">-->
+<!--        <tr class="text-white">-->
+<!--            <th>Name</th>-->
+<!--            <th>FirstName</th>-->
+<!--            <th>LastName</th>-->
+<!--            <th>Request Date</th>-->
+<!--            <th>Type</th>-->
+<!--            <th>State</th>-->
+<!--            <td th:if="${isAdmin || isManager}">~</td>-->
+<!--            <td th:if="${isAdmin || isManager}">-</td>-->
+<!--        </tr>-->
+<!--        </thead>-->
+<!--        <tbody th:each="request : ${requestPage.content}">-->
+<!--        <tr>-->
+<!--            <div th:if="${request.getId() != changeId}">-->
+<!--                <td><input disabled th:value="${request.getName()}" class="border-0 rounded-pill p-2"></td>-->
+<!--                <td><input disabled th:value="${request.employee.firstName}"-->
+<!--                           class="border-0 rounded-pill p-2"></td>-->
+<!--                <td><input disabled th:value="${request.employee.lastName}"-->
+<!--                           class="border-0 rounded-pill p-2"></td>-->
+<!--                <td><input disabled th:value="${request.getRequest_date()}"-->
+<!--                           class="border-0 rounded-pill p-2"></td>-->
+<!--                <td><input disabled th:value="${request.getRequest_type()}"-->
+<!--                           class="border-0 rounded-pill p-2"></td>-->
+<!--                <td><input disabled th:value="${request.getStatus()}"-->
+<!--                           class="border-0 rounded-pill p-2"></td>-->
+<!--                <td th:if="${isAdmin || isManager}">-->
+<!--                    <a th:if="${request.getStatus() == 'PENDING'}" th:href="@{/employees/AcceptRequest/{id}(id=${request.getId()})}" class="btn btn-info">Approve</a>-->
+<!--                </td>-->
+<!--                <td th:if="${isAdmin || isManager}">-->
+<!--                    <a th:if="${request.getStatus() == 'PENDING'}" th:href="@{/employees/RejectRequest/{id}(id=${request.getId()})}" class="btn btn-info">Reject</a>-->
+<!--                </td>-->
+<!--            </div>-->
+<!--        </tr>-->
+<!--        </tbody>-->
+<!--    </table>-->
+<!--    &lt;!&ndash;    <div th:if="${message}" class="alert alert-success">&ndash;&gt;-->
+<!--    &lt;!&ndash;        <span th:text="${message}"></span>&ndash;&gt;-->
+<!--    &lt;!&ndash;    </div>&ndash;&gt;-->
+
+<!--    <div class="d-flex justify-content-between align-items-center mt-3">-->
+<!--        <span th:text="'Page ' + (${currentPage} + 1) + ' of ' + ${totalPages}"></span>-->
+<!--        <div>-->
+<!--            <a class="btn btn-secondary"-->
+<!--               th:if="${currentPage > 0}"-->
+<!--               th:href="@{/employees/seeRequets(page=${currentPage - 1}, size=${5})}">-->
+<!--                Previous-->
+<!--            </a>-->
+<!--            <a class="btn btn-secondary"-->
+<!--               th:if="${currentPage + 1 < totalPages}"-->
+<!--               th:href="@{/employees/seeRequets(page=${currentPage + 1}, size=${5})}">-->
+<!--                Next-->
+<!--            </a>-->
+<!--        </div>-->
+<!--    </div>-->
+
+<!--&lt;!&ndash;    <div>&ndash;&gt;-->
+<!--&lt;!&ndash;        <form method="get" th:action="@{/employees/seeRequets}">&ndash;&gt;-->
+<!--&lt;!&ndash;            <div class="input-group mb-3">&ndash;&gt;-->
+<!--&lt;!&ndash;                <select name="status" class="form-select">&ndash;&gt;-->
+<!--&lt;!&ndash;                    <option value="" th:selected="${statusFilter == null}">All</option>&ndash;&gt;-->
+<!--&lt;!&ndash;                    <option value="APPROVED" th:selected="${statusFilter == 'APPROVED'}">Approved</option>&ndash;&gt;-->
+<!--&lt;!&ndash;                    <option value="REJECTED" th:selected="${statusFilter == 'REJECTED'}">Rejected</option>&ndash;&gt;-->
+<!--&lt;!&ndash;                    <option value="PENDING" th:selected="${statusFilter == 'PENDING'}">Pending</option>&ndash;&gt;-->
+<!--&lt;!&ndash;                </select>&ndash;&gt;-->
+<!--&lt;!&ndash;                <input type="hidden" name="page" th:value="${currentPage}">&ndash;&gt;-->
+<!--&lt;!&ndash;                <input type="hidden" name="size" value="5">&ndash;&gt;-->
+<!--&lt;!&ndash;                <button class="btn btn-primary" type="submit">Filter</button>&ndash;&gt;-->
+<!--&lt;!&ndash;            </div>&ndash;&gt;-->
+<!--&lt;!&ndash;        </form>&ndash;&gt;-->
+<!--&lt;!&ndash;    </div>&ndash;&gt;-->
+
+
+<!--    <div class="position-absolute top-0 end-0 my-2 d-flex">-->
+<!--        <form action="#" th:action="@{/logout}" method="post">-->
+<!--            <input class="btn btn-outline-secondary" type="submit" value="logout"/>-->
+<!--        </form>-->
+<!--    </div>-->
+<!--</div>-->

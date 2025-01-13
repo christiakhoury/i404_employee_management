@@ -6,34 +6,111 @@
     <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
 </head>
 <body>
-<div class="vh-100 container">
-    <h3>Employee Directory</h3>
-    <hr>
-    <h5>save Employee</h5>
-    <form class="form-check w-100" method="POST" action="#" th:action="@{/employees/employees/add}" th:object="${employee}">
-        <input type="text" placeholder="First Name" class="input-group-text" name="firstName" required>
-        <br>
-        <input type="text" placeholder="Last Name" class="input-group-text" name="lastName" required>
-        <br>
-        <input type="email" placeholder="Email" class="input-group-text" name="email" required>
-        <br>
-        <input type="text" placeholder="User Name" class="input-group-text" name="username" required>
-        <br>
-<!--        <input type="text" placeholder="Role" class="input-group-text" name="role" required>-->
-        <select id="role" name="role" class="input-group-text w-97" >
-            <option th:each="role : ${roles}" th:value="${role}" th:text="${role}"></option>
-        </select>
-        <br>
-        <select id="department" name="department" class="input-group-text w-90">
-            <option th:each="department : ${departments}" th:value="${department}" th:text="${department}"></option>
-        </select>
-        <br>
-        <input type="password" placeholder="Password" class="input-group-text" name="password" required>
-        <i th:if="${registrationError}" th:text="${registrationError}" class="text-danger"></i>
-        <button class="btn btn-outline-info my-3" type="submit">save</button>
-    </form>
-    <hr>
-    <a href="/" class="text-decoration-none">back to Employee List</a>
+<div class="vh-100 d-flex justify-content-center align-items-center container">
+    <div class="w-100 col-md-6 col-lg-4">
+        <h3 class="text-center mb-4">Employee Directory</h3>
+        <hr>
+        <h5 class="mb-4 text-center">Save Employee</h5>
+
+        <form class="form-check w-100" method="POST" action="#" th:action="@{/employees/employees/add}" th:object="${employee}">
+            <!-- First Name -->
+            <div class="mb-3">
+                <input type="text" placeholder="First Name" class="form-control" name="firstName" required>
+            </div>
+
+            <!-- Last Name -->
+            <div class="mb-3">
+                <input type="text" placeholder="Last Name" class="form-control" name="lastName" required>
+            </div>
+
+            <!-- Email -->
+            <div class="mb-3">
+                <input type="email" placeholder="Email" class="form-control" name="email" required>
+            </div>
+
+            <!-- User Name -->
+            <div class="mb-3">
+                <input type="text" placeholder="User Name" class="form-control" name="username" required>
+            </div>
+
+            <!-- Role -->
+            <div class="mb-3">
+                <select id="role" name="role" class="form-select w-100" required>
+                    <option th:each="role : ${roles}" th:value="${role}" th:text="${role}"></option>
+                </select>
+            </div>
+
+            <!-- Department -->
+            <div class="mb-3">
+                <select id="department" name="department" class="form-select w-100" required>
+                    <option th:each="department : ${departments}" th:value="${department}" th:text="${department}"></option>
+                </select>
+            </div>
+
+            <!-- Password -->
+            <div class="mb-3">
+                <input type="password" placeholder="Password" class="form-control" name="password" required>
+            </div>
+
+            <!-- Error Message -->
+            <div class="mb-3 text-center">
+                <i th:if="${registrationError}" th:text="${registrationError}" class="text-danger"></i>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="text-center">
+                <button class="btn btn-outline-info w-100" type="submit">Save</button>
+            </div>
+        </form>
+
+        <hr>
+        <div class="text-center">
+            <a href="/" class="text-decoration-none">Back to Employee List</a>
+        </div>
+    </div>
 </div>
+
 </body>
 </html>
+
+
+
+<!--<!DOCTYPE html>-->
+<!--<html lang="en" xmlns:th="http://www.thymeleaf.org">-->
+<!--<head>-->
+<!--    <meta charset="UTF-8">-->
+<!--    <title>Add Employee</title>-->
+<!--    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">-->
+<!--</head>-->
+<!--<body>-->
+<!--<div class="vh-100 container">-->
+<!--    <h3>Employee Directory</h3>-->
+<!--    <hr>-->
+<!--    <h5>save Employee</h5>-->
+<!--    <form class="form-check w-100" method="POST" action="#" th:action="@{/employees/employees/add}" th:object="${employee}">-->
+<!--        <input type="text" placeholder="First Name" class="input-group-text" name="firstName" required>-->
+<!--        <br>-->
+<!--        <input type="text" placeholder="Last Name" class="input-group-text" name="lastName" required>-->
+<!--        <br>-->
+<!--        <input type="email" placeholder="Email" class="input-group-text" name="email" required>-->
+<!--        <br>-->
+<!--        <input type="text" placeholder="User Name" class="input-group-text" name="username" required>-->
+<!--        <br>-->
+<!--&lt;!&ndash;        <input type="text" placeholder="Role" class="input-group-text" name="role" required>&ndash;&gt;-->
+<!--        <select id="role" name="role" class="input-group-text w-97" >-->
+<!--            <option th:each="role : ${roles}" th:value="${role}" th:text="${role}"></option>-->
+<!--        </select>-->
+<!--        <br>-->
+<!--        <select id="department" name="department" class="input-group-text w-90">-->
+<!--            <option th:each="department : ${departments}" th:value="${department}" th:text="${department}"></option>-->
+<!--        </select>-->
+<!--        <br>-->
+<!--        <input type="password" placeholder="Password" class="input-group-text" name="password" required>-->
+<!--        <i th:if="${registrationError}" th:text="${registrationError}" class="text-danger"></i>-->
+<!--        <button class="btn btn-outline-info my-3" type="submit">save</button>-->
+<!--    </form>-->
+<!--    <hr>-->
+<!--    <a href="/" class="text-decoration-none">back to Employee List</a>-->
+<!--</div>-->
+<!--</body>-->
+<!--</html>-->
