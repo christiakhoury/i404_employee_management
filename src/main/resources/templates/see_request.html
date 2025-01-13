@@ -10,6 +10,21 @@
     <h3>Requests</h3>
     <hr>
     <div>
+        <form method="get" th:action="@{/employees/seeRequets}">
+            <div class="input-group mb-3">
+                <select name="status" class="form-select">
+                    <option value="" th:selected="${statusFilter == null}">All</option>
+                    <option value="APPROVED" th:selected="${statusFilter == 'APPROVED'}">Approved</option>
+                    <option value="REJECTED" th:selected="${statusFilter == 'REJECTED'}">Rejected</option>
+                    <option value="PENDING" th:selected="${statusFilter == 'PENDING'}">Pending</option>
+                </select>
+                <input type="hidden" name="page" th:value="${currentPage}">
+                <button class="btn btn-primary" type="submit">Filter</button>
+            </div>
+        </form>
+    </div>
+
+    <div>
         <a sec:authorize="hasAnyRole('MANAGER','ADMIN')" class="btn btn-info mb-3"
            th:href="@{/employees/addEmployee}">Add Employee</a>
 
@@ -73,6 +88,22 @@
             </a>
         </div>
     </div>
+
+<!--    <div>-->
+<!--        <form method="get" th:action="@{/employees/seeRequets}">-->
+<!--            <div class="input-group mb-3">-->
+<!--                <select name="status" class="form-select">-->
+<!--                    <option value="" th:selected="${statusFilter == null}">All</option>-->
+<!--                    <option value="APPROVED" th:selected="${statusFilter == 'APPROVED'}">Approved</option>-->
+<!--                    <option value="REJECTED" th:selected="${statusFilter == 'REJECTED'}">Rejected</option>-->
+<!--                    <option value="PENDING" th:selected="${statusFilter == 'PENDING'}">Pending</option>-->
+<!--                </select>-->
+<!--                <input type="hidden" name="page" th:value="${currentPage}">-->
+<!--                <input type="hidden" name="size" value="5">-->
+<!--                <button class="btn btn-primary" type="submit">Filter</button>-->
+<!--            </div>-->
+<!--        </form>-->
+<!--    </div>-->
 
 
     <div class="position-absolute top-0 end-0 my-2 d-flex">

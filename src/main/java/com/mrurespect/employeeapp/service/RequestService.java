@@ -22,4 +22,10 @@ public interface RequestService {
     void acceptrejectRequest(Long id, RequestDTO requestDAO, Model model, Authentication authentication, String rejected);
 
     Page<Request> getAllPaginatedRequests(int page, int size);
+
+    Page<Request> getRequestsByStatus(int page, int size, String status);
+
+//    Page<Request> getPaginatedRequestsByDepartmentAndStatus(int page, int size, Department departmentId, String status);
+
+    Page<Request> getHisRequestsByStatus(int page, int size, Employee employee, String status);
 }
