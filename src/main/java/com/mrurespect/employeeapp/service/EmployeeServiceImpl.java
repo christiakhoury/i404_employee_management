@@ -1,29 +1,17 @@
 package com.mrurespect.employeeapp.service;
 
-import com.mrurespect.employeeapp.dao.EmployeeUserDTOImpl;
+import com.mrurespect.employeeapp.dao.*;
 import com.mrurespect.employeeapp.dao.rowMapper.EmployeeMapper;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import com.mrurespect.employeeapp.dao.DepartmentDAO;
-import com.mrurespect.employeeapp.dao.EmployeeRepository;
-import com.mrurespect.employeeapp.dao.RoleDao;
 import com.mrurespect.employeeapp.entity.Employee;
-import com.mrurespect.employeeapp.entity.User;
-import com.mrurespect.employeeapp.security.WebUser;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.ui.Model;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -73,26 +61,62 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         System.out.println("User and Employee deleted for ID: " + employeeId);
     }
-
     @Override
-    public void addEmployee(Model model, Authentication authentication) {
-        model.addAttribute(new Employee());
-        List<String> roles;
-        if (authentication.getAuthorities().stream().anyMatch(auth -> "ROLE_ADMIN".equals(auth.getAuthority()))){
-            roles = Arrays.asList("ADMIN", "MANAGER", "EMPLOYEE");
+    @Transactional
+    public Employee save(Employee theEmployee) {
+        Employee employee;
+        if (!Objects.equals(null, theEmployee)){
+            employee = theEmployee;
         }
         else {
-            roles = Arrays.asList("MANAGER", "EMPLOYEE");
+            employee = new Employee();
         }
-        model.addAttribute("roles", roles);
-        List<String> departments = departmentService.findAllNameDepartments();
-        model.addAttribute("departments", departments);
+
+        employee.setEmail(theEmployee.getEmail());
+        employee.setFirstName(theEmployee.getFirstName());
+        employee.setLastName(theEmployee.getLastName());
+        employee.setDepartment(theEmployee.getDepartment());
+
+        if (theEmployee.getDepartment().equals("HR")) {
+            employee.setDepartment_id(departmentDAO.findDepartmentByName("HR"));
+        }
+        if (theEmployee.getDepartment().equals("DEVELOPMENT")) {
+            employee.setDepartment_id(departmentDAO.findDepartmentByName("DEVELOPMENT"));
+        }
+        if (theEmployee.getDepartment().equals("NETWORKING")) {
+            employee.setDepartment_id(departmentDAO.findDepartmentByName("NETWORKING"));
+        }
+        if (theEmployee.getDepartment().equals("IT")) {
+            employee.setDepartment_id(departmentDAO.findDepartmentByName("IT"));
+        }
+        if (theEmployee.getDepartment().equals("SALES")) {
+            employee.setDepartment_id(departmentDAO.findDepartmentByName("SALES"));
+        }
+        employeeRepository.save(employee);
+        return employee;
     }
+
 
 //    @Override
 //    public List<Employee> findAll() {
 //        return employeeRepository.findAll();
 //    }
+
+//    @Override
+//    public Employee save(EmployeeUserDTO employeeUserDTO) {
+//        return null;
+//    }
+
+    @Override
+    public Employee save(EmployeeUserDTOImpl employeeUserDTO) {
+        Employee theEmployee = new Employee();
+        theEmployee.setFirstName(employeeUserDTO.getFirstName());
+        theEmployee.setLastName(employeeUserDTO.getLastName());
+        theEmployee.setEmail(employeeUserDTO.getEmail());
+        theEmployee.setDepartment(employeeUserDTO.getDepartment());
+        Employee employeeee = this.save(theEmployee);
+        return employeeee;
+    }
 
     public List<Employee> findAll() {
         String sql = "SELECT * FROM employees";
@@ -122,6 +146,8 @@ public class EmployeeServiceImpl implements EmployeeService {
 //    public Employee save(Employee theEmployee) {
 //
 //    }
+
+
 
     @Override
     public void deleteById(int theId) {
