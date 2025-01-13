@@ -80,6 +80,10 @@
         <input type="hidden" th:field="*{id}" th:value="${id}">
         <input type="hidden" name="status" value="PENDING">
 
+        <div th:if="${error}" class="alert alert-danger">
+            <span th:text="${error}"></span>
+        </div>
+        <br>
         <!-- Submit Button -->
         <button class="btn btn-outline-info my-3" type="submit">Save</button>
     </form>
