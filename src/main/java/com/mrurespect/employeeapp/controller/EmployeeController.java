@@ -13,6 +13,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -287,6 +288,22 @@ public class EmployeeController {
                                 @Autowired Authentication authentication) {
 
         Employee employee_id = userDao.findByUserName(authentication.getName()).getEmployee();
+
+        LocalDate requestDate = requestDAO.getRequest_date();
+
+        LocalDate today = LocalDate.now();
+
+        if (requestDate.isBefore(today)) {
+            // Add a validation error message
+            model.addAttribute("error", "Request date cannot be before today.");
+
+            List<String> requestTypes = requesttTypeService.findAllNameRequestType();
+            model.addAttribute("requestTypes", requestTypes);
+            model.addAttribute("employee", new Employee());
+
+            return "create_request";
+        }
+
         Request request_id = new Request();
         request_id.setEmployee(employee_id);
         request_id.setName(requestDAO.getName());
