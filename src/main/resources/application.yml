@@ -17,7 +17,7 @@ server:
   port: 8081
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/db_project_3
+    url: jdbc:postgresql://localhost:5432/db_project_4
     username: postgres
     password: admin
     driver-class-name: org.postgresql.Driver

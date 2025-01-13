@@ -6,10 +6,7 @@ import com.mrurespect.employeeapp.entity.Employee;
 import com.mrurespect.employeeapp.entity.Request;
 import com.mrurespect.employeeapp.entity.RequesttType;
 import com.mrurespect.employeeapp.entity.dto.RequestDTO;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -248,6 +245,24 @@ public class RequestServiceImpl implements RequestService{
     @Override
     public Page<Request> getAllPaginatedRequests(int page, int size) {
         return requestRepository.findAll(PageRequest.of(page, size, Sort.by("id").ascending()));
+    }
+
+    @Override
+    public Page<Request> getRequestsByStatus(int page, int size, String status) {
+        Pageable pageable = PageRequest.of(page, size);
+        return requestRepository.findByStatus(status, pageable);
+    }
+
+//    @Override
+//    public Page<Request> getPaginatedRequestsByDepartmentAndStatus(int page, int size, Department departmentId, String status) {
+//            Pageable pageable = PageRequest.of(page, size);
+//            return requestRepository.findByDepartmentIdAndStatus(departmentId, status, pageable);
+//        }
+
+    @Override
+    public Page<Request> getHisRequestsByStatus(int page, int size, Employee employee, String status) {
+            Pageable pageable = PageRequest.of(page, size);
+            return requestRepository.findByEmployeeAndStatus(employee, status, pageable);
     }
 
 }

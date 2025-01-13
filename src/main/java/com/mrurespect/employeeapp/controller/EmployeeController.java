@@ -156,9 +156,10 @@ public class EmployeeController {
 
         // set employee as a model attribute to pre-populate the form
         model.addAttribute("employee", employee);
-//        List<String> departments = departmentService.findAllNameDepartments();
-//        model.addAttribute("departments", departments);
+        model.addAttribute("selectedDepartment", employee.getDepartment());
 
+        List<String> departments = departmentService.findAllNameDepartments();
+        model.addAttribute("departments", departments);
         return "update_employee";
     }
 
@@ -167,9 +168,12 @@ public class EmployeeController {
                                Model model) {
         System.out.println(employee);
         employeeService.save(employee);
-//        List<String> departments = departmentService.findAllNameDepartments();
-//        model.addAttribute("departments", departments);
+
+        model.addAttribute("selectedDepartment", employee.getDepartment());
+
 //        return "redirect:/employees/list?page=" + page;
+        List<String> departments = departmentService.findAllNameDepartments();
+        model.addAttribute("departments", departments);
         return "update_employee";
     }
 
@@ -203,7 +207,7 @@ public class EmployeeController {
     public String seeRequests(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int size,
-//            @RequestParam(required = false) String status,
+            @RequestParam(required = false) String status,
             Model model,
             @Autowired Authentication authentication
     ) {
@@ -218,22 +222,59 @@ public class EmployeeController {
 
         String username_user = authentication.getName();
         User user = userService.findByUserName(username_user);
+
         Page<Request> request_page;
+
         if (username_user.equals("admin") || user.getRole().equals("ADMIN")) {
-            request_page = requestService.getAllPaginatedRequests(page, size);
+            // Apply the role-based pagination for ADMIN
+            if (status != null && !status.isEmpty()) {
+                // Filter by status if status is provided
+                request_page = requestService.getRequestsByStatus(page, size, status);
+            } else {
+                // Get all requests if no status filter is provided
+                request_page = requestService.getAllPaginatedRequests(page, size);
+            }
         } else if (user.getRole().equals("MANAGER")) {
+            // Apply the role-based pagination for MANAGER
             List<Request> departmentRequests = requestService.getRequestsByDepartment(user.getEmployee().getDepartment_id());
             model.addAttribute("requests", departmentRequests);
-            request_page = requestService.getPaginatedRequests(page, size, user.getEmployee().getDepartment_id());
+
+//            if (status != null && !status.isEmpty()) {
+//                // Filter by status if status is provided
+//                request_page = requestService.getPaginatedRequestsByDepartmentAndStatus(page, size, user.getEmployee().getDepartment_id(), status);
+//            } else {
+                // Get paginated requests by department if no status filter is provided
+                request_page = requestService.getPaginatedRequests(page, size, user.getEmployee().getDepartment_id());
+//            }
         } else {
-            request_page = requestService.getHisRequests(page, size, user.getEmployee());
+            // Apply the role-based pagination for EMPLOYEE
+            if (status != null && !status.isEmpty()) {
+                // Filter by status if status is provided
+                request_page = requestService.getHisRequestsByStatus(page, size, user.getEmployee(), status);
+            } else {
+                // Get paginated requests for the employee if no status filter is provided
+                request_page = requestService.getHisRequests(page, size, user.getEmployee());
+            }
         }
-//
-//        if (status != null && !status.isEmpty()) {
-//            requestPage = requestService.getRequestsByStatus(page, size, status);
+
+        model.addAttribute("statusFilter", status);
+        model.addAttribute("requestPage", request_page);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", request_page.getTotalPages());
+
+
+
+//        Page<Request> request_page;
+//        if (username_user.equals("admin") || user.getRole().equals("ADMIN")) {
+//            request_page = requestService.getAllPaginatedRequests(page, size);
+//        } else if (user.getRole().equals("MANAGER")) {
+//            List<Request> departmentRequests = requestService.getRequestsByDepartment(user.getEmployee().getDepartment_id());
+//            model.addAttribute("requests", departmentRequests);
+//            request_page = requestService.getPaginatedRequests(page, size, user.getEmployee().getDepartment_id());
 //        } else {
-//            requestPage = requestService.getAllPaginatedRequests(page, size);
+//            request_page = requestService.getHisRequests(page, size, user.getEmployee());
 //        }
+
         model.addAttribute("changeId", value);
         model.addAttribute("requestPage", request_page);
         model.addAttribute("currentPage", page);
